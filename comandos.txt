@@ -2,3 +2,6 @@ python -m uvicorn main:app --reload
 pip install sqlalchemy
 python.exe -m pip install --upgrade pip
 Base.metadata.create_all(bind=engine)
+(git add .)
+(git commit -m "mensagem")
+(git push)

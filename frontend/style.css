@@ -1,0 +1,61 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: aliceblue;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+}
+
+.container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.input_field {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.register-button {
+    width: 100%;
+    padding: 10px;
+
+    background-color: #4CAF50;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.register-button:hover {
+    background-color: #45a049;
+}
+
+.client-list {
+    margin-top: 20px;
+}
+
+.client-card {
+    background: #f1f1f1;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+}

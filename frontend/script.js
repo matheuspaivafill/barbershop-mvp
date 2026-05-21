@@ -56,7 +56,8 @@ function loadClients() {
     .then(data => {
         data.forEach(function(client){
             const clientCard = document.createElement("div")
-            clientCard.innerText = client.name
+            clientCard.classList.add("Client-card")
+            clientCard.innerText = `${client.name} - ${client.phone}`
             clientsList.appendChild(clientCard)
             loadClients()
         })
