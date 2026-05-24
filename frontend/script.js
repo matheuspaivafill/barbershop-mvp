@@ -3,6 +3,7 @@ const name = document.getElementById("name")
 const phone = document.getElementById("phone")
 const clientsList = document.getElementById("clients-list")
 
+
 console.log("Script carregou")
 
 button.addEventListener("click", function (event) {
@@ -47,29 +48,40 @@ button.addEventListener("click", function (event) {
 
 function loadClients() {
 
-    clientsList.innerHTML = "" 
-    
+    clientsList.innerHTML = ""
+
     fetch("http://127.0.0.1:8000/clients")
-    
-    .then(response => response.json())
 
-    .then(data => {
-        data.forEach(function(client){
-            const clientCard = document.createElement("div")
-            clientCard.classList.add("Client-card")
-            clientCard.innerText = `${client.name} - ${client.phone}`
-            clientsList.appendChild(clientCard)
+        .then(response => response.json())
+
+        .then(data => {
             loadClients()
+
+            console.log("DEBUG:", data)
+
+            data.forEach(function(client) {
+
+                const clientCard = document.createElement("div")
+
+                const deleteButton = document.createElement("button")
+                
+                deleteButton.innerText = "🗑"
+
+                clientCard.appendChild(deleteButton)
+
+                clientCard.classList.add("client-card")
+
+                clientCard.innerText = `${client.name} - ${client.phone}`
+
+                clientsList.appendChild(clientCard)
+
+            })
+
         })
-        console.log(data)
 
-    })
-
-    .catch(error => {
-
-        console.log(error)
-
-    })
-
+        .catch(error => {
+            console.log(error)
+        })
 }
 loadClients()
+
