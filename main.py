@@ -45,6 +45,20 @@ def create_client(client: ClientCreate):
 def list_clients():
     return db.query(Client).all()
 
+@app.delete("/client/{client_id}")
+def delete_client(client_id: int):
+
+    client = db.query(Client).filter(
+        Client.id == client_id  
+    ).first()
+    if not client:
+        return {"Error": "Cliente não encontrado"}
+    
+    db.delete(client)
+    db.commit()
+    return {"message": f"Cliente {client_id} apagado com sucesso!"}
+
+
 
 
 @app.post("/appointment")
@@ -100,7 +114,7 @@ def delete_appointment(appointment_id: int):
 
 
 @app.get("/appointments/{date}")
-def create_schedule(date: str): 
+def clist_schedule(date: str): 
 
     appointments_day = db.query(Appointment).filter(
         Appointment.date == date

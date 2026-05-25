@@ -55,7 +55,6 @@ function loadClients() {
         .then(response => response.json())
 
         .then(data => {
-            loadClients()
 
             console.log("DEBUG:", data)
 
@@ -63,17 +62,33 @@ function loadClients() {
 
                 const clientCard = document.createElement("div")
 
-                const deleteButton = document.createElement("button")
-                
-                deleteButton.innerText = "🗑"
-
-                clientCard.appendChild(deleteButton)
-
                 clientCard.classList.add("client-card")
 
                 clientCard.innerText = `${client.name} - ${client.phone}`
 
+                const deleteButton = document.createElement("button")
+
+                deleteButton.innerText = "🗑"
+
+                clientCard.appendChild(deleteButton)
+
                 clientsList.appendChild(clientCard)
+
+                deleteButton.addEventListener("click", function() {
+
+                    fetch(`http://127.0.0.1:8000/client/${client.id}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data)
+                        loadClients()
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+
+                })
 
             })
 
@@ -84,4 +99,3 @@ function loadClients() {
         })
 }
 loadClients()
-
