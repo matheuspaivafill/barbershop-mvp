@@ -1,34 +1,41 @@
 <!DOCTYPE html>
-<head>
-    <link rel="stylesheet" href="style.css">
+<html>
 
+<head>
+    <title>Agenda Pro</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
     <div class="container">
 
-    <h1>Cadastro de clientes</h1>
+        <h1>Agenda Pro</h1>
 
-    <p>Nome</p>
-    <input id="name" class="input_field">
+        <p>
+            Gerencie clientes e agendamentos de forma simples.
+        </p>
 
-    <p>Telefone</p>
-    <input id="phone" class="input_field">
+        <button
+            class="register-button"
+            onclick="window.location.href='clients.html'">
 
-    <button type="button" id= "register-button" class="register-button">
-    Cadastro
-    </button>
+            Clientes
 
-    <h2>Clientes</h2>
+        </button>
 
-    <div id="clients-list" class="client-list"></div>
+        <br><br>
 
-    
-    
-    <script src="script.js"></script>
-    
+        <button
+            class="register-button"
+            onclick="window.location.href='appointments.html'">
+
+            Agendamentos
+
+        </button>
+
+    </div>
+
 </body>
 
 </html>
-
