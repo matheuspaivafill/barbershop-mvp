@@ -1,7 +1,7 @@
 console.log("appointments.js carregou")
-
+let clients = []
+const clientSelect = document.getElementById("client-select")
 const button = document.getElementById("register-button")
-const clientId = document.getElementById("client_id")
 const date = document.getElementById("date")
 const time = document.getElementById("time")
 const appointmentsList = document.getElementById("appointments-list")
@@ -17,7 +17,7 @@ button.addEventListener("click", function (event) {
         "Content-Type": "application/json"
     },
     body: JSON.stringify({
-        client_id: Number(clientId.value),
+        client_id: Number(clientSelect.value),
         date: date.value,
         time: time.value
     })
@@ -37,7 +37,7 @@ button.addEventListener("click", function (event) {
 
     loadAppointments()
 
-    clientId.value = ""
+    clientSelect.selectedIndex = 0
     date.value = ""
     time.value = ""
 
@@ -72,10 +72,23 @@ function loadAppointments() {
 
             appointmentCard.classList.add("client-card")
 
-            
+            const client = clients.find(
+                c => c.id === appointment.client_id
+            )
+
+            const clientName = client
+                ? client.name
+                : `Cliente ${appointment.client_id}`
+
+            console.log(
+                "appointment:",
+                appointment.client_id,
+                "client:",
+                client
+            )
 
             appointmentCard.innerText =
-            `Cliente ID: ${appointment.client_id}
+            `${clientName}
             | Data: ${appointment.date}
             | Horário: ${appointment.time}`
             
@@ -119,4 +132,40 @@ function loadAppointments() {
 })
 
 }
-loadAppointments()
+
+function loadClients() {
+
+    fetch("http://127.0.0.1:8000/clients")
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            clients = data
+
+            clientSelect.innerHTML = ""
+
+            data.forEach(function(client) {
+
+                const option = document.createElement("option")
+
+                option.value = client.id
+                option.innerText = client.name
+
+                clientSelect.appendChild(option)
+
+            })
+            
+            loadAppointments()
+
+        })
+
+        .catch(error => {
+
+            console.log(error)
+
+        })
+        
+}
+
+loadClients()
