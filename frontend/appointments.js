@@ -5,11 +5,19 @@ const button = document.getElementById("register-button")
 const date = document.getElementById("date")
 const time = document.getElementById("time")
 const appointmentsList = document.getElementById("appointments-list")
+date.addEventListener("change", function() {
 
+    loadAvailableTimes()
+})
 
 button.addEventListener("click", function (event) {
 
     event.preventDefault()
+
+    if (!clientSelect.value) {
+        alert("Selecione um cliente")
+        return
+    }
 
     fetch("http://127.0.0.1:8000/appointment", {
     method: "POST",
@@ -145,6 +153,13 @@ function loadClients() {
 
             clientSelect.innerHTML = ""
 
+            const defaultOption = document.createElement("option")
+
+            defaultOption.value = ""
+            defaultOption.innerText = "Selecione um cliente"
+            
+            clientSelect.appendChild(defaultOption)
+
             data.forEach(function(client) {
 
                 const option = document.createElement("option")
@@ -168,4 +183,40 @@ function loadClients() {
         
 }
 
+function loadAvailableTimes() {
+
+    if (!date.value) {
+        return
+    }
+
+    fetch(`http://127.0.0.1:8000/available-times/${date.value}`)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            time.innerHTML = ""
+
+            data.forEach(function(hour) {
+
+                const option = document.createElement("option")
+
+                option.value = hour
+                option.innerText = hour
+
+                time.appendChild(option)
+
+            })
+
+        })
+
+        .catch(error => {
+
+            console.log(error)
+
+        })
+
+}
+
 loadClients()
+
