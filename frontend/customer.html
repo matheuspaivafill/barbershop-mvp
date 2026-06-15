@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sou Cliente</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Sou Cliente</h1>
+
+        <button
+            class="register-button"
+            onclick="window.location.href='index.html'">
+
+            ← Voltar
+
+        </button>
+
+        <br><br>
+
+        <h2>Cadastro</h2>
+
+        <p>Nome</p>
+        <input id="name" class="input_field">
+
+        <p>Telefone</p>
+        <input id="phone" class="input_field">
+
+        <button
+            type="button"
+            id="register-client-button"
+            class="register-button">
+
+            Cadastrar
+
+        </button>
+
+        <br><br>
+
+        <h2>Agendamento</h2>
+
+        <p>Clientes</p>
+
+        <select id="client-select" class="input_field">
+        </select>
+
+        <p>Data</p>
+
+        <input
+            type="date"
+            id="date"
+            class="input_field">
+
+        <p>Horário</p>
+
+        <select
+            id="time"
+            class="input_field">
+
+        </select>
+
+        <button
+            id="create-appointment-button"
+            class="register-button">
+
+            Criar agendamento
+
+        </button>
+
+    </div>
+
+    <script src="clients.js"></script>
+    <script src="appointments.js"></script>
+
+</body>
+
+</html>

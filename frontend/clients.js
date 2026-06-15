@@ -1,4 +1,4 @@
-const button = document.getElementById("register-button")
+const button = document.getElementById("register-client-button")
 const name = document.getElementById("name")
 const phone = document.getElementById("phone")
 const clientsList = document.getElementById("clients-list")
@@ -47,6 +47,10 @@ button.addEventListener("click", function (event) {
 
 
 function loadClients() {
+
+    if (!clientsList) {
+        returnS
+    }
 
     clientsList.innerHTML = ""
 

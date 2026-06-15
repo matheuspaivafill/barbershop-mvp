@@ -1,7 +1,8 @@
 console.log("appointments.js carregou")
 let clients = []
 const clientSelect = document.getElementById("client-select")
-const button = document.getElementById("register-button")
+const appointmentButton =
+    document.getElementById("create-appointment-button")
 const date = document.getElementById("date")
 const time = document.getElementById("time")
 const appointmentsList = document.getElementById("appointments-list")
@@ -10,7 +11,7 @@ date.addEventListener("change", function() {
     loadAvailableTimes()
 })
 
-button.addEventListener("click", function (event) {
+appointmentButton.addEventListener("click", function (event) {
 
     event.preventDefault()
 
@@ -43,7 +44,7 @@ button.addEventListener("click", function (event) {
 
     alert("Agendamento criado!")
 
-    loadAppointments()
+    //loadAppointments()
 
     clientSelect.selectedIndex = 0
     date.value = ""
@@ -171,7 +172,7 @@ function loadClients() {
 
             })
             
-            loadAppointments()
+            //loadAppointments()
 
         })
 
@@ -218,5 +219,7 @@ function loadAvailableTimes() {
 
 }
 
-loadClients()
+if (clientSelect) {
+    loadClients()
+}
 
