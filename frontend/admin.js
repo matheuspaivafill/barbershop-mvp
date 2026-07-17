@@ -1,9 +1,11 @@
 const clientsList = document.getElementById("clients-list")
-let clients = []
 const appointmentsList = document.getElementById("appointments-list")
 
+let clients = []
 
 function loadClients() {
+
+    console.log("loadClients executou")
 
     clientsList.innerHTML = ""
 
@@ -17,40 +19,51 @@ function loadClients() {
 
             console.log(data)
 
+            clientsList.innerHTML = ""
+
             data.forEach(function(client) {
 
-        const clientCard = document.createElement("div")
-        const deleteButton = document.createElement("button")
+                const clientCard = document.createElement("div")
+                const deleteButton = document.createElement("button")
 
-            deleteButton.innerText = "🗑"
+                deleteButton.innerText = "🗑"
 
-        clientCard.classList.add("client-card")
+                clientCard.classList.add("client-card")
+                clientCard.innerText = `Nome: ${client.name} 
+                Telefone: ${client.phone}`
 
-        clientCard.innerText =
-            `${client.name} - ${client.phone}`
+                clientCard.appendChild(deleteButton)
+                clientsList.appendChild(clientCard)
 
-        clientCard.appendChild(deleteButton)
-
-        clientsList.appendChild(clientCard)
-
-        deleteButton.addEventListener("click", function() {
+                deleteButton.addEventListener("click", function() {
 
                     fetch(`http://127.0.0.1:8000/client/${client.id}`, {
                         method: "DELETE"
                     })
+
                     .then(response => response.json())
+
                     .then(data => {
+
                         console.log(data)
+
                         loadClients()
+
                     })
+
                     .catch(error => {
+
                         console.log(error)
+
                     })
 
-    })})
-        loadAppointments()
+                })
 
-})
+            })
+
+            loadAppointments()
+
+        })
 
         .catch(error => {
 
@@ -59,9 +72,11 @@ function loadClients() {
         })
 
 }
-loadClients()
 
 function loadAppointments() {
+
+    console.log("loadAppointments executou")
+
     appointmentsList.innerHTML = ""
 
     fetch("http://127.0.0.1:8000/appointments")
@@ -72,7 +87,9 @@ function loadAppointments() {
 
             console.log(data)
 
-            data.forEach(function(appointment){
+            appointmentsList.innerHTML = ""
+
+            data.forEach(function(appointment) {
 
                 const appointmentCard = document.createElement("div")
                 const deleteButton = document.createElement("button")
@@ -82,60 +99,66 @@ function loadAppointments() {
                 appointmentCard.classList.add("client-card")
 
                 const client = clients.find(
-                c => c.id === appointment.client_id
+                    c => c.id === appointment.client_id
                 )
 
                 const clientName = client
-                ? client.name
-                : `Cliente ${appointment.client_id}`
+                    ? client.name
+                    : `Cliente ${appointment.client_id}`
 
                 console.log(
-                "appointment:",
-                appointment.client_id,
-                "client:",
-                client
+                    "appointment:",
+                    appointment.client_id,
+                    "client:",
+                    client
                 )
 
                 appointmentCard.innerText =
-                `${clientName}
-                | Data: ${appointment.date}
-                | Horário: ${appointment.time}`
-                
-            
+                    `${clientName} 
+                    Data: ${appointment.date} 
+                    Horário: ${appointment.time}`
 
                 appointmentCard.appendChild(deleteButton)
 
-            deleteButton.addEventListener("click", function() {
+                deleteButton.addEventListener("click", function() {
 
-                fetch(
-                    `http://127.0.0.1:8000/appointment/${appointment.id}`,
-                    {
-                    method: "DELETE"
-                     }
-               )
+                    fetch(
+                        `http://127.0.0.1:8000/appointment/${appointment.id}`,
+                        {
+                            method: "DELETE"
+                        }
+                    )
 
-               .then(response => response.json())
+                    .then(response => response.json())
 
-               .then(data => {
+                    .then(data => {
 
-                    console.log(data)
+                        console.log(data)
 
-                    loadAppointments()
+                        loadAppointments()
 
-              })
+                    })
 
-               .catch(error => {
+                    .catch(error => {
 
-                    console.log(error)
+                        console.log(error)
 
-             })
-            
-       })
-        appointmentsList.appendChild(appointmentCard)
+                    })
+
+                })
+
+                appointmentsList.appendChild(appointmentCard)
+
+            })
+
         })
+
         .catch(error => {
+
             console.log(error)
+
         })
-    })
+
 }
+
 loadClients()
