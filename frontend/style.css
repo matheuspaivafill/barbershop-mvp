@@ -72,23 +72,64 @@ p {
    LAYOUT
 ======================================================= */
 
-.container {
+/* =======================================================
+   LAYOUT
+======================================================= */
+
+.home-container {
 
     width: 90%;
 
-    max-width: 900px;
+    max-width: 520px;
 
     margin: auto;
 
-    padding: 50px 20px;
+    padding: 50px 35px;
+
+    background: #FFFFFF;
+
+    border-radius: 24px;
+
+    box-shadow: 0 12px 35px rgba(0,0,0,.08);
 
     text-align: center;
 
-    background: white;
+}
 
-    border-radius: 18px;
+.customer-container {
 
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    width: 90%;
+
+    max-width: 650px;
+
+    margin: auto;
+
+    padding: 50px 35px;
+
+    background: #FFFFFF;
+
+    border-radius: 24px;
+
+    box-shadow: 0 12px 35px rgba(0,0,0,.08);
+
+}
+
+.admin-container {
+
+    width: 90%;
+
+    max-width: 950px;
+
+    margin: auto;
+
+    padding: 50px 35px;
+
+    background: #FFFFFF;
+
+    border-radius: 24px;
+
+    box-shadow: 0 12px 35px rgba(0,0,0,.08);
+
 }
 
 /* =======================================================
@@ -230,7 +271,7 @@ p {
 
     border-radius: 50%;
 
-    background: #faf8f8cc;
+    background: #2563EB;
 
     font-size: 35px;
 
