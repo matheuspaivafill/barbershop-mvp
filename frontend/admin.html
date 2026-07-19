@@ -1,48 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 
 <head>
-    <title>Administração</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
 
-    <link rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin>
+<meta charset="UTF-8">
 
-    <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+<title>Administração</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+rel="stylesheet">
+
 </head>
 
+
 <body>
-    <div class="container">
-
-        <button
-        class="register-button"
-        onclick="window.location.href='index.html'">
-
-        ← Voltar
-
-        </button>
-        ``
-
-        <h1>Painel Administrativo</h1>
 
 
-        <br><br>
-        
-        <h2>Clientes</h2>
+<div class="container">
 
-        <div id="clients-list" class="client-list"></div>
 
-        <h2>Agendamentos</h2>
+<h1 class="logo">
+    Agenda <span>Pro</span>
+</h1>
 
-        <div id="appointments-list"></div>
-        
-    </div>
+
+<p class="subtitle">
+    Gerencie clientes e agendamentos.
+</p>
+
+
+
+<div class="dashboard">
+
+
+<div class="summary-card">
+
+<h3>
+Clientes
+</h3>
+
+<strong id="total-clients">
+0
+</strong>
+
+
+</div>
+
+
+
+<div class="summary-card">
+
+<h3>
+Agendamentos
+</h3>
+
+<strong id="total-appointments">
+0
+</strong>
+
+
+</div>
+
+
+</div>
+
+
+
+<h2>
+Clientes
+</h2>
+
+
+<div id="clients-list">
+
+</div>
+
+
+
+<h2>
+Agendamentos
+</h2>
+
+
+<div id="appointments-list">
+
+</div>
+
+
+
+<button
+class="register-button"
+onclick="window.location.href='index.html'">
+
+← Voltar
+
+</button>
+
+
+</div>
+
+
+
 <script src="admin.js"></script>
 
+
 </body>
+
 </html>

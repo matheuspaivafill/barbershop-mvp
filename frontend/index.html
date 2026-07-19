@@ -1,52 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 
 <head>
+
+    <meta charset="UTF-8">
+
     <title>Agenda Pro</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin>
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
-    <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
-    
+
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>Agenda Pro</h1>
+    <h1 class="logo">
+        Agenda <span>Pro</span>
+    </h1>
+
+    <p class="subtitle">
+        Gerencie clientes e agendamentos de forma simples, rápida e organizada.
+    </p>
+
+    <div class="home-card"
+         onclick="window.location.href='customer.html'">
+
+        <div class="icon-box">
+            👤
+        </div>
+
+        <h2>Sou Cliente</h2>
 
         <p>
-            Gerencie clientes e agendamentos de forma simples.
+            Cadastre-se e agende um horário.
         </p>
 
-        <button
-            class="register-button"
-            onclick="window.location.href='customer.html'">
+    </div>
 
-            Sou Cliente
+    <div class="home-card"
+         onclick="window.location.href='admin.html'">
 
-        </button>
+        <div class="icon-box">
+            🛠
+        </div>
 
-        <br><br>
+        <h2>Área Administrativa</h2>
 
-        <button
-            class="register-button"
-            onclick="window.location.href='admin.html'">
-
-            Área Administrativa
-
-        </button>
+        <p>
+            Gerencie clientes e acompanhe os agendamentos.
+        </p>
 
     </div>
+
+    <footer>
+
+        Agenda Pro © 2026
+
+    </footer>
+
+</div>
 
 </body>
 
