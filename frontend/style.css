@@ -213,6 +213,26 @@ p {
 
 }
 
+.dashboard-header{
+
+    text-align:left;
+
+    margin-bottom:40px;
+
+}
+
+.dashboard-description{
+
+    margin-top:10px;
+
+    color:#6B7280;
+
+    font-size:16px;
+
+    line-height:1.6;
+
+}
+
 /* =======================================================
    HOME
 ======================================================= */
@@ -285,12 +305,13 @@ p {
 
     display:flex;
 
-    gap:20px;
+    gap:25px;
 
-    margin-bottom:40px;
+    margin-bottom:50px;
+
+    flex-wrap:wrap;
 
 }
-
 .summary-card{
 
     flex:1;
@@ -304,6 +325,16 @@ p {
     box-shadow:0 8px 18px rgba(0,0,0,.08);
 
     transition:.25s;
+
+    min-width:220px;
+
+    display:block;
+
+    margin-top:8px;
+
+    color:#6B7280;
+
+    font-size:15px;
 
 }
 
@@ -329,9 +360,37 @@ p {
 
 .summary-card strong{
 
-    font-size:38px;
+    display:block;
+
+    margin-top:8px;
+
+    font-size:42px;
+
+    font-weight:700;
 
     color:#2563EB;
+
+}
+
+.summary-icon{
+
+    width:60px;
+
+    height:60px;
+
+    margin:0 auto 18px;
+
+    border-radius:16px;
+
+    background:#DBEAFE;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:30px;
 
 }
 
@@ -358,6 +417,8 @@ p {
     align-items:center;
 
     transition:.25s;
+
+    gap: 25px;
 
 }
 
@@ -410,5 +471,81 @@ footer{
     color:#9CA3AF;
 
     font-size:14px;
+
+}
+
+.card-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.card-info h3{
+
+    margin:0;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    color:#1F2937;
+
+}
+
+.card-info p{
+
+    margin:0;
+
+    color:#6B7280;
+
+    font-size:15px;
+
+}
+
+.section-divider{
+
+    border:none;
+
+    border-top:1px solid #E5E7EB;
+
+    margin:40px 0;
+
+}
+
+.search-box{
+
+    margin-bottom:25px;
+
+}
+
+.search-box input{
+
+    width:100%;
+
+    padding:14px 18px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#F3F4F6;
+
+    font-size:15px;
+
+    transition:.25s;
+
+}
+
+.search-box input:focus{
+
+    outline:none;
+
+    background:#FFFFFF;
+
+    box-shadow:0 0 0 3px rgba(37,99,235,.15);
 
 }

@@ -21,94 +21,111 @@ rel="stylesheet">
 
 <body>
 
-
 <div class="admin-container">
 
+    <div class="dashboard-header">
 
-<h1 class="logo">
-    Agenda <span>Pro</span>
-</h1>
+        <div>
 
+            <h1 class="logo">
+                Agenda <span>Pro</span>
+            </h1>
 
-<p class="subtitle">
-    Gerencie clientes e agendamentos.
-</p>
+            <p class="subtitle">
+                Painel Administrativo
+            </p>
 
+            <p class="dashboard-description">
+                Gerencie clientes, acompanhe agendamentos e mantenha sua agenda organizada.
+            </p>
 
+        </div>
 
-<div class="dashboard">
+    </div>
 
+    <div class="dashboard">
 
-<div class="summary-card">
+        <div class="summary-card">
 
-<h3>
-Clientes
-</h3>
+            <div class="summary-icon">
+                👥
+            </div>
 
-<strong id="total-clients">
-0
-</strong>
+            <h3>Clientes</h3>
 
+            <strong id="total-clients">
+                0
+            </strong>
+
+            <span>
+                cadastrados
+            </span>
+
+        </div>
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📅
+            </div>
+
+            <h3>Agendamentos</h3>
+
+            <strong id="total-appointments">
+                0
+            </strong>
+
+            <span>
+                marcados
+            </span>
+
+            </div>
+
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="clients-title">
+        Clientes
+    </h2>
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="search-client"
+            placeholder="🔍 Pesquisar cliente...">
+
+    </div>
+
+    <div id="clients-list"></div>
+
+    <h2 id="appointments-title">
+        Agendamentos
+    </h2>
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="search-appointment"
+            placeholder="🔍 Pesquisar agendamento...">
+
+    </div>
+
+    <div id="appointments-list"></div>
+
+    <button
+        class="register-button"
+        onclick="window.location.href='index.html'">
+
+        ← Voltar
+
+    </button>
 
 </div>
-
-
-
-<div class="summary-card">
-
-<h3>
-Agendamentos
-</h3>
-
-<strong id="total-appointments">
-0
-</strong>
-
-
-</div>
-
-
-</div>
-
-
-
-<h2>
-Clientes
-</h2>
-
-
-<div id="clients-list">
-
-</div>
-
-
-
-<h2>
-Agendamentos
-</h2>
-
-
-<div id="appointments-list">
-
-</div>
-
-
-
-<button
-class="register-button"
-onclick="window.location.href='index.html'">
-
-← Voltar
-
-</button>
-
-
-</div>
-
-
 
 <script src="admin.js"></script>
-
 
 </body>
 
