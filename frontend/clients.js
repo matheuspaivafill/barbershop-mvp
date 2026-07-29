@@ -1,10 +1,14 @@
+window.addEventListener("beforeunload", function () {
+    console.log("A página vai recarregar!")
+})
 const button = document.getElementById("register-client-button")
 const name = document.getElementById("name")
 const phone = document.getElementById("phone")
 const clientsList = document.getElementById("clients-list")
 
 
-console.log("Script carregou")
+console.log("Script carregou", new Date())
+
 
 button.addEventListener("click", function (event) {
 
@@ -32,7 +36,7 @@ button.addEventListener("click", function (event) {
 
     console.log(data)
 
-    alert("Cliente criado!")
+    showToast("Cliente cadastrado com sucesso!")
 
     name.value = ""
     phone.value = ""
@@ -42,6 +46,8 @@ button.addEventListener("click", function (event) {
     .catch(error => {
 
     console.log(error)
+
+    showToast("Error ao cadastrar cliente!", true)
 })
 }) 
 
@@ -49,7 +55,7 @@ button.addEventListener("click", function (event) {
 function loadClients() {
 
     if (!clientsList) {
-        returnS
+        return
     }
 
     clientsList.innerHTML = ""
@@ -85,10 +91,16 @@ function loadClients() {
                     })
                     .then(response => response.json())
                     .then(data => {
+
                         console.log(data)
+
+                        showToast("Cliente excluído com sucesso!")
+
                         loadClients()
                     })
+
                     .catch(error => {
+
                         console.log(error)
                     })
 
@@ -101,5 +113,29 @@ function loadClients() {
         .catch(error => {
             console.log(error)
         })
+}
+
+function showToast(message, isError = false){
+
+    toast.innerText = message
+
+    if(isError){
+
+        toast.classList.add("error")
+
+    }else{
+
+        toast.classList.remove("error")
+
+    }
+
+    toast.classList.add("show")
+
+    setTimeout(function(){
+
+        toast.classList.remove("show")
+
+    },3000)
+
 }
 loadClients()

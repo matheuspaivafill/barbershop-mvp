@@ -1,4 +1,5 @@
-console.log("appointments.js carregou")
+console.log("appointments.js carregou", new Date())
+
 let clients = []
 const clientSelect = document.getElementById("client-select")
 const appointmentButton =
@@ -6,6 +7,8 @@ const appointmentButton =
 const date = document.getElementById("date")
 const time = document.getElementById("time")
 const appointmentsList = document.getElementById("appointments-list")
+
+
 date.addEventListener("change", function() {
 
     loadAvailableTimes()
@@ -42,7 +45,7 @@ appointmentButton.addEventListener("click", function (event) {
             return
         }
 
-    alert("Agendamento criado!")
+        showToast("Agendamento criado com sucesso!")
 
     //loadAppointments()
 
@@ -56,7 +59,7 @@ appointmentButton.addEventListener("click", function (event) {
 
     console.log(error)
 
-    alert("Erro ao criar agendamento!")
+    showToast("Erro ao criar agendamento!", true)
 })
 
 })
@@ -117,6 +120,8 @@ function loadAppointments() {
                .then(data => {
 
                     console.log(data)
+
+                    showToast("Agendamento excluído com sucesso!")
 
                     loadAppointments()
 
@@ -223,3 +228,26 @@ if (clientSelect) {
     loadClients()
 }
 
+function showToast(message, isError = false){
+
+    toast.innerText = message
+
+    if(isError){
+
+        toast.classList.add("error")
+
+    }else{
+
+        toast.classList.remove("error")
+
+    }
+
+    toast.classList.add("show")
+
+    setTimeout(function(){
+
+        toast.classList.remove("show")
+
+    },3000)
+
+}
