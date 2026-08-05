@@ -189,7 +189,6 @@ function loadClients() {
 
         })
 
-        document.getElementById("customer-total").innerText = data.length
         
 }
 
@@ -216,7 +215,7 @@ function loadAvailableTimes() {
 
                 time.appendChild(option)
 
-                document.getElementById("today-available").innerText = data.length
+            
 
             })
 
@@ -234,29 +233,3 @@ if (clientSelect) {
     loadClients()
 }
 
-function updateNextAppointment(data){
-
-    const nextAppointment = document.getElementById("next-appointment")
-
-    if(data.length === 0){
-
-        nextAppointment.innerText = "-"
-
-        return
-
-    }
-
-    const sortedAppointments = [...data].sort(function(a,b){
-
-        const dateA = new Date(`${a.date}T${a.time}`)
-
-        const dateB = new Date(`${b.date}T${b.time}`)
-
-        return dateA - dateB
-
-    })
-
-    nextAppointment.innerText =
-        `${sortedAppointments[0].date} às ${sortedAppointments[0].time}`
-
-}
