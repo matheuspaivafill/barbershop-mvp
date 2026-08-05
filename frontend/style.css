@@ -22,16 +22,6 @@ body {
 
     color: #1F2937;
 
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    min-height: 100vh;
-
-    padding: 30px;
-
 }
 
 h1 {
@@ -80,9 +70,9 @@ p {
 
     width: 90%;
 
-    max-width: 520px;
+    max-width: 900px;
 
-    margin: auto;
+    margin: 50px auto;
 
     padding: 50px 35px;
 
@@ -100,7 +90,7 @@ p {
 
     width: 90%;
 
-    max-width: 650px;
+    max-width: 700px;
 
     margin: auto;
 
@@ -118,9 +108,9 @@ p {
 
     width: 90%;
 
-    max-width: 950px;
+    max-width: 900px;
 
-    margin: auto;
+    margin: 50px auto;
 
     padding: 50px 35px;
 
@@ -136,17 +126,31 @@ p {
    COMPONENTES
 ======================================================= */
 
-.input_field {
+.input_field{
 
-    width: 100%;
+    width:100%;
 
-    padding: 10px;
+    padding:14px;
 
-    margin-bottom: 10px;
+    margin-bottom:18px;
 
-    border: 1px solid #ccc;
+    border:1px solid #D1D5DB;
 
-    border-radius: 8px;
+    border-radius:12px;
+
+    font-size:15px;
+
+    transition:.2s;
+
+}
+
+.input_field:focus{
+
+    outline:none;
+
+    border-color:#2563EB;
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
 
 }
 
@@ -154,9 +158,9 @@ p {
 
     width:100%;
 
-    padding:14px;
+    padding:15px;
 
-    margin-top:30px;
+    margin-top:18px;
 
     border:none;
 
@@ -179,6 +183,8 @@ p {
 .register-button:hover{
 
     background:#1D4ED8;
+
+    transform:translateY(-2px);
 
 }
 
@@ -303,15 +309,18 @@ p {
 
 .dashboard{
 
+    width:90%;
+
+    max-width:700px;
+
+    margin:0 auto 30px;
+
     display:flex;
 
-    gap:25px;
-
-    margin-bottom:50px;
-
-    flex-wrap:wrap;
+    gap:20px;
 
 }
+
 .summary-card{
 
     flex:1;
@@ -324,17 +333,9 @@ p {
 
     box-shadow:0 8px 18px rgba(0,0,0,.08);
 
+    text-align:center;
+
     transition:.25s;
-
-    min-width:220px;
-
-    display:block;
-
-    margin-top:8px;
-
-    color:#6B7280;
-
-    font-size:15px;
 
 }
 
@@ -653,5 +654,87 @@ footer{
 #toast.error{
 
     background:#EF4444;
+
+}
+
+.customer-header{
+
+    width:90%;
+
+    max-width:700px;
+
+    margin:50px auto 35px;
+
+    position:relative;
+
+    text-align:center;
+
+}
+
+.customer-container{
+
+    width:90%;
+
+    max-width:700px;
+
+    margin:auto;
+
+}
+
+.form-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:30px;
+
+    margin-bottom:25px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.form-card h2{
+
+    margin-bottom:8px;
+
+}
+
+.section-description{
+
+    color:#6B7280;
+
+    margin-bottom:25px;
+
+    font-size:15px;
+
+}
+
+.back-button{
+
+    position:absolute;
+
+    left:0;
+
+    top:0;
+
+    background:none;
+
+    border:none;
+
+    color:#2563EB;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+.back-button:hover{
+
+    text-decoration:underline;
 
 }

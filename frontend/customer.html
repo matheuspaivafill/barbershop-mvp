@@ -18,62 +18,117 @@
 
 <body>
 
-    <div class="customer-container">
-
-        <h1>Sou Cliente</h1>
-
+    <div class="customer-header">
+            
         <button
-            class="register-button"
+            class="back-button"
             onclick="window.location.href='index.html'">
 
-            ← Voltar
+            ← Início
 
         </button>
 
-        <br><br>
+        <h1 class="logo">
+        Agenda <span>Pro</span>
+        </h1>
 
-        <h2>Cadastro</h2>
+        <p class="subtitle">
+        Agende seu horário em poucos segundos.
+        </p>
 
-        <p>Nome</p>
-        <input id="name" class="input_field">
+    </div>
 
-        <p>Telefone</p>
-        <input id="phone" class="input_field">
+    <div class="dashboard">
 
-        <button
+        <div class="summary-card">
+
+            <h3>👤 Clientes</h3>
+
+            <strong id="customer-total">
+            0
+            </strong>
+
+        </div>
+
+        <div class="summary-card">
+
+            <h3>📅 Horários Hoje</h3>
+
+            <strong id="today-available">
+                --
+            </strong>
+
+        </div>
+
+        <div class="summary-card">
+
+            <h3>⭐ Próximo</h3>
+
+            <strong id="next-appointment">
+                --
+            </strong>
+
+        </div>
+
+    </div>
+    
+    <div class="customer-container">
+
+        <div class="form-card">
+
+            <h2>👤 Cadastro</h2>
+
+            <p class="section-description">
+                Informe seus dados para criar seu cadastro.
+            </p>
+
+            <p>Nome</p>
+        
+            <input id="name" class="input_field">
+        
+            <p>Telefone</p>
+            <input id="phone" class="input_field">
+            
+            <button
             type="button"
             id="register-client-button"
             class="register-button">
 
             Cadastrar
 
-        </button>
+            </button>
 
-        <br><br>
+        </div>
 
-        <h2>Agendamento</h2>
+        
+        <div class="form-card">
 
-        <p>Clientes</p>
+            <h2>📅 Agendamento</h2>
 
-        <select id="client-select" class="input_field">
-        </select>
+            <p class="section-description">
+                Escolha a data e o horário disponível
+            </p>
 
-        <p>Data</p>
+            <p>Clientes</p>
 
-        <input
+            <select id="client-select" class="input_field">
+            </select>
+
+            <p>Data</p>
+
+            <input
             type="date"
             id="date"
             class="input_field">
 
-        <p>Horário</p>
+            <p>Horário</p>
 
-        <select
+            <select
             id="time"
             class="input_field">
+            </select>
 
-        </select>
-
-        <button
+            <button
 
             type="button"
             id="create-appointment-button"
@@ -81,7 +136,11 @@
 
             Criar agendamento
 
-        </button>
+            </button>
+
+
+        </div>
+
 
     </div>
 

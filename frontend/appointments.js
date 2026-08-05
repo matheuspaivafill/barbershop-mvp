@@ -186,6 +186,8 @@ function loadClients() {
             console.log(error)
 
         })
+
+        document.getElementById("customer-total").innerText = data.length
         
 }
 
@@ -212,6 +214,8 @@ function loadAvailableTimes() {
 
                 time.appendChild(option)
 
+                document.getElementById("today-available").innerText = data.length
+
             })
 
         })
@@ -228,26 +232,3 @@ if (clientSelect) {
     loadClients()
 }
 
-function showToast(message, isError = false){
-
-    toast.innerText = message
-
-    if(isError){
-
-        toast.classList.add("error")
-
-    }else{
-
-        toast.classList.remove("error")
-
-    }
-
-    toast.classList.add("show")
-
-    setTimeout(function(){
-
-        toast.classList.remove("show")
-
-    },3000)
-
-}
