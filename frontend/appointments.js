@@ -75,6 +75,8 @@ function loadAppointments() {
 
             console.log(data)
 
+            updateNextAppointment(data)
+
             data.forEach(function(appointment) {
 
             const appointmentCard = document.createElement("div")
@@ -232,3 +234,29 @@ if (clientSelect) {
     loadClients()
 }
 
+function updateNextAppointment(data){
+
+    const nextAppointment = document.getElementById("next-appointment")
+
+    if(data.length === 0){
+
+        nextAppointment.innerText = "-"
+
+        return
+
+    }
+
+    const sortedAppointments = [...data].sort(function(a,b){
+
+        const dateA = new Date(`${a.date}T${a.time}`)
+
+        const dateB = new Date(`${b.date}T${b.time}`)
+
+        return dateA - dateB
+
+    })
+
+    nextAppointment.innerText =
+        `${sortedAppointments[0].date} às ${sortedAppointments[0].time}`
+
+}
