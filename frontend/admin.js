@@ -1,3 +1,9 @@
+// Verifica se o utilizador está logado. Se não estiver, envia para a página de login
+const token = localStorage.getItem("token")
+if (!token) {
+    window.location.href = "login.html"
+}
+
 const clientsList = document.getElementById("clients-list")
 const appointmentsList = document.getElementById("appointments-list")
 const totalClients = document.getElementById("total-clients")
@@ -7,220 +13,127 @@ const searchAppointment = document.getElementById("search-appointment")
 const clientsTitle = document.getElementById("clients-title")
 const appointmentsTitle = document.getElementById("appointments-title")
 
-
 let clients = []
 
+// Função auxiliar com os cabeçalhos de autenticação
+function getAuthHeaders() {
+    return {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json"
+    }
+}
+
 function loadClients() {
+    fetch(`${API_URL}/clients`, {
+        headers: getAuthHeaders()
+    })
+    .then(response => {
+        if (response.status === 401) {
+            localStorage.clear()
+            window.location.href = "login.html"
+            return
+        }
+        return response.json()
+    })
+    .then(data => {
+        if (!data) return
+        clients = data
+        clientsTitle.innerText = `Clientes (${data.length})`
+        totalClients.innerText = data.length
+        clientsList.innerHTML = ""
 
-    console.log("loadClients executou")
+        data.forEach(function(client) {
+            const search = searchClient ? searchClient.value.toLowerCase() : ""
+            if (!client.name.toLowerCase().includes(search)) return
 
-    clientsList.innerHTML = ""
+            const clientCard = document.createElement("div")
+            const deleteButton = document.createElement("button")
+            deleteButton.innerText = "🗑"
 
-    fetch("http://127.0.0.1:8000/clients")
-
-        .then(response => response.json())
-
-        .then(data => {
-
-            clients = data
-
-            clientsTitle.innerText =
-            `Clientes (${data.length})`
-
-            totalClients.innerText = data.length
-
-            console.log(data)
-
-            clientsList.innerHTML = ""
-
-            data.forEach(function(client) {
-
-                const search = searchClient.value.toLowerCase()
-
-                if (!client.name.toLowerCase().includes(search)){
-
-                    return
-
-                }
-
-                const clientCard = document.createElement("div")
-                const deleteButton = document.createElement("button")
-
-                deleteButton.innerText = "🗑"
-
-                clientCard.classList.add("client-card")
-                clientCard.innerHTML = `
-                    <div class="card-info">
+            clientCard.classList.add("client-card")
+            clientCard.innerHTML = `
+                <div class="card-info">
                     <h3>👤 ${client.name}</h3>
                     <p>📞 ${client.phone}</p>
-                    </div>
-                `
-                clientCard.appendChild(deleteButton)
-                clientsList.appendChild(clientCard)
+                </div>
+            `
+            clientCard.appendChild(deleteButton)
+            clientsList.appendChild(clientCard)
 
-                deleteButton.addEventListener("click", function() {
+            deleteButton.addEventListener("click", function() {
+                if (!confirm("Deseja realmente excluir este cliente?")) return
 
-                    if (!confirm("Deseja realmente excluir este cliente?")){
-
-                        return
-
-                    }
-
-                    fetch(`http://127.0.0.1:8000/client/${client.id}`, {
-                        method: "DELETE"
-                    })
-
-                    .then(response => response.json())
-
-                    .then(data => {
-
-                        console.log(data)
-
-                        loadClients()
-
-                    })
-
-                    .catch(error => {
-
-                        console.log(error)
-
-                    })
-
+                fetch(`${API_URL}/client/${client.id}`, {
+                    method: "DELETE",
+                    headers: getAuthHeaders()
                 })
-
+                .then(response => response.json())
+                .then(() => loadClients())
+                .catch(error => console.error(error))
             })
-
-            loadAppointments()
-
         })
 
-        .catch(error => {
-
-            console.log(error)
-
-        })
-
+        loadAppointments()
+    })
+    .catch(error => console.error(error))
 }
 
 function loadAppointments() {
+    fetch(`${API_URL}/appointments`, {
+        headers: getAuthHeaders()
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data) return
+        appointmentsTitle.innerText = `Agendamentos (${data.length})`
+        totalAppointments.innerText = data.length
+        appointmentsList.innerHTML = ""
 
-    console.log("loadAppointments executou")
+        data.forEach(function(appointment) {
+            const appointmentCard = document.createElement("div")
+            const deleteButton = document.createElement("button")
+            deleteButton.innerText = "🗑"
+            appointmentCard.classList.add("client-card")
 
-    appointmentsList.innerHTML = ""
+            const client = clients.find(c => c.id === appointment.client_id)
+            const clientName = client ? client.name : `Cliente ${appointment.client_id}`
 
-    fetch("http://127.0.0.1:8000/appointments")
+            const search = searchAppointment ? searchAppointment.value.toLowerCase() : ""
+            if (!clientName.toLowerCase().includes(search)) return
 
-        .then(response => response.json())
+            appointmentCard.innerHTML = `
+                <div class="card-info">
+                    <h3>📅 ${clientName}</h3>
+                    <p>🗓 ${appointment.date}</p>
+                    <p>🕒 ${appointment.time}</p>
+                </div>
+            `
+            appointmentCard.appendChild(deleteButton)
 
-        .then(data => {
+            deleteButton.addEventListener("click", function() {
+                if (!confirm("Deseja realmente excluir este agendamento?")) return
 
-            console.log(data)
-
-            appointmentsTitle.innerText =
-            `Agendamentos (${data.length})`
-
-            totalAppointments.innerText = data.length
-
-            appointmentsList.innerHTML = ""
-
-            data.forEach(function(appointment) {
-
-                const appointmentCard = document.createElement("div")
-                const deleteButton = document.createElement("button")
-
-                deleteButton.innerText = "🗑"
-
-                appointmentCard.classList.add("client-card")
-
-                const client = clients.find(
-                    c => c.id === appointment.client_id
-                )
-
-                const clientName = client
-                    ? client.name
-                    : `Cliente ${appointment.client_id}`
-
-                const search = searchAppointment.value.toLowerCase()
-
-                if (!clientName.toLowerCase().includes(search)){
-
-                    return
-
-                }
-
-                console.log(
-                    "appointment:",
-                    appointment.client_id,
-                    "client:",
-                    client
-                )
-
-                appointmentCard.innerHTML = `
-                    <div class="card-info">
-                        <h3>📅 ${clientName}</h3>
-                        <p>🗓 ${appointment.date}</p>
-                        <p>🕒 ${appointment.time}</p>
-                    </div>
-                `
-
-                appointmentCard.appendChild(deleteButton)
-
-                deleteButton.addEventListener("click", function() {
-
-                    if (!confirm("Deseja realmente excluir este agendamento?")){
-
-                        return
-
-                    }
-                    
-                    fetch(
-                        `http://127.0.0.1:8000/appointment/${appointment.id}`,
-                        {
-                            method: "DELETE"
-                        }
-                    )
-
-                    .then(response => response.json())
-
-                    .then(data => {
-
-                        console.log(data)
-
-                        loadAppointments()
-
-                    })
-
-                    .catch(error => {
-
-                        console.log(error)
-
-                    })
-
+                fetch(`${API_URL}/appointment/${appointment.id}`, {
+                    method: "DELETE",
+                    headers: getAuthHeaders()
                 })
-
-                appointmentsList.appendChild(appointmentCard)
-
+                .then(response => response.json())
+                .then(() => loadAppointments())
+                .catch(error => console.error(error))
             })
 
+            appointmentsList.appendChild(appointmentCard)
         })
-
-        .catch(error => {
-
-            console.log(error)
-
-        })
-
+    })
+    .catch(error => console.error(error))
 }
 
 loadClients()
 
-searchClient.addEventListener("input", function() {
+if (searchClient) {
+    searchClient.addEventListener("input", () => loadClients())
+}
 
-    loadClients()
-})
-
-searchAppointment.addEventListener("input",function(){
-
-    loadAppointments()
-
-})
+if (searchAppointment) {
+    searchAppointment.addEventListener("input", () => loadAppointments())
+}

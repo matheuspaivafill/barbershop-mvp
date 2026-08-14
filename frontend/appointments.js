@@ -23,7 +23,7 @@ appointmentButton.addEventListener("click", function (event) {
         return
     }
 
-    fetch("http://127.0.0.1:8000/appointment", {
+    fetch(`${API_URL}/appointment`, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -67,7 +67,7 @@ appointmentButton.addEventListener("click", function (event) {
 function loadAppointments() {
     appointmentsList.innerHTML = ""
 
-    fetch("http://127.0.0.1:8000/appointments")
+    fetch(`${API_URL}/appointments`)
 
         .then(response => response.json())
 
@@ -111,11 +111,10 @@ function loadAppointments() {
             deleteButton.addEventListener("click", function() {
 
                 fetch(
-                    `http://127.0.0.1:8000/appointment/${appointment.id}`,
+                    `${API_URL}/appointment/${appointment.id}`,
                     {
                     method: "DELETE"
-                     }
-               )
+                })
 
                .then(response => response.json())
 
@@ -151,7 +150,7 @@ function loadAppointments() {
 
 function loadClients() {
 
-    fetch("http://127.0.0.1:8000/clients")
+    fetch(`${API_URL}/clients`)
 
         .then(response => response.json())
 
@@ -198,7 +197,7 @@ function loadAvailableTimes() {
         return
     }
 
-    fetch(`http://127.0.0.1:8000/available-times/${date.value}`)
+    fetch(`${API_URL}/available-times/${date.value}`)
 
         .then(response => response.json())
 

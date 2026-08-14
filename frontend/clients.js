@@ -21,7 +21,7 @@ button.addEventListener("click", function (event) {
     console.log("Botão clicado!")
     
     
-    fetch("http://127.0.0.1:8000/client", {
+    fetch(`${API_URL}/client`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
@@ -34,14 +34,13 @@ button.addEventListener("click", function (event) {
 
     .then(data => {
 
-    console.log(data)
+        console.log(data)
 
-    showToast("Cliente cadastrado com sucesso!")
+        showToast("Cliente cadastrado com sucesso!");
+        name.value = "";
+        hone.value = "";
 
-    name.value = ""
-    phone.value = ""
-
-})
+    })
 
     .catch(error => {
 
@@ -60,7 +59,7 @@ function loadClients() {
 
     clientsList.innerHTML = ""
 
-    fetch("http://127.0.0.1:8000/clients")
+    fetch(`${API_URL}/clients`)
 
         .then(response => response.json())
 
@@ -86,7 +85,7 @@ function loadClients() {
 
                 deleteButton.addEventListener("click", function() {
 
-                    fetch(`http://127.0.0.1:8000/client/${client.id}`, {
+                    fetch(`${API_URL}/client/${client.id}`, {
                         method: "DELETE"
                     })
                     .then(response => response.json())

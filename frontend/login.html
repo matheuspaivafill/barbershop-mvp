@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Agenda Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
+</head>
+<body>
+    <div class="home-container">
+        <div class="logo">Agenda <span>Pro</span></div>
+        <p class="subtitle">Acesse o painel do seu estabelecimento</p>
+
+        <form id="login-form" class="form-card" style="text-align: left; max-width: 400px; margin: 0 auto;">
+            <label style="display:block; margin-bottom: 8px; font-weight: 600;">E-mail</label>
+            <input type="email" id="login-email" class="input_field" placeholder="seu@email.com" required>
+
+            <label style="display:block; margin-bottom: 8px; font-weight: 600;">Senha</label>
+            <input type="password" id="login-password" class="input_field" placeholder="******" required>
+
+            <button type="submit" class="register-button">Entrar</button>
+        </form>
+
+        <p style="margin-top: 25px;">
+            Ainda não tem conta? <a href="register.html" style="color: #2563EB; font-weight: 600; text-decoration: none;">Cadastre o seu estabelecimento</a>
+        </p>
+    </div>
+
+    <div id="toast"></div>
+    <script src="toast.js"></script>
+    <script src="login.js"></script>
+</body>
+</html>

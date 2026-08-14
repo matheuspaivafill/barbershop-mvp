@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Agenda Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
+</head>
+<body>
+    <div class="home-container">
+        <div class="logo">Agenda <span>Pro</span></div>
+        <p class="subtitle">Cadastre o seu estabelecimento</p>
+
+        <form id="register-form" class="form-card" style="text-align: left; max-width: 450px; margin: 0 auto;">
+            <label style="display:block; margin-bottom: 8px; font-weight: 600;">Nome do Estabelecimento</label>
+            <input type="text" id="reg-name" class="input_field" placeholder="Ex: Barbearia Silva" required>
+
+            <label style="display:block; margin-bottom: 8px; font-weight: 600;">Link Personalizado (Slug)</label>
+            <input type="text" id="reg-slug" class="input_field" placeholder="Ex: barbearia-silva" required>
+
+            <label style="display:block; margin-bottom: 8px; font-weight: 600;">E-mail</label>
+            <input type="email" id="reg-email" class="input_field" placeholder="seu@email.com" required>
+
+            <label style="display:block; margin-bottom: 8px; font-weight: 600;">Senha</label>
+            <input type="password" id="reg-password" class="input_field" placeholder="******" required>
+
+            <button type="submit" class="register-button">Criar Conta</button>
+        </form>
+
+        <p style="margin-top: 25px;">
+            Já tem conta? <a href="login.html" style="color: #2563EB; font-weight: 600; text-decoration: none;">Faça login</a>
+        </p>
+    </div>
+
+    <div id="toast"></div>
+    <script src="toast.js"></script>
+    <script src="register.js"></script>
+</body>
+</html>
