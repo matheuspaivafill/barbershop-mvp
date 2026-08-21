@@ -1,6 +1,9 @@
+import re
 import jwt
 from datetime import datetime, timedelta
-from fastapi import FastAPI, Depends, HTTPException, status, Header
+from fastapi import FastAPI, Depends, HTTPException, status, Header, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
@@ -10,9 +13,23 @@ from models import Business, Client, Appointment
 from schemas import BusinessCreate, BusinessLogin, ClientCreate, AppointmentCreate
 
 # Configurações de Segurança
-SECRET_KEY = "sua_chave_secreta_super_segura_mude_em_producao"
+import os
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY não definida. Configure a variável de ambiente SECRET_KEY "
+        "antes de subir o servidor (nunca use uma chave fixa em produção)."
+    )
 ALGORITHM = "HS256"
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Lista de origens autorizadas a chamar a API (troque pelo domínio real em produção)
+ALLOWED_ORIGINS = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://127.0.0.1:5500,http://localhost:5500"
+).split(",")
 
 # Cria as tabelas atualizadas no banco de dados
 Base.metadata.create_all(bind=engine)
@@ -21,11 +38,26 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Transforma os erros técnicos de validação (422) em mensagens simples,
+# em português, para aparecerem certinho nos toasts do frontend.
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    first_error = exc.errors()[0]
+    field = first_error["loc"][-1] if first_error.get("loc") else "campo"
+    message = first_error.get("msg", "Valor inválido.")
+    # Pydantic prefixa mensagens customizadas com "Value error, " — removemos para ficar mais limpo.
+    message = message.replace("Value error, ", "")
+    return JSONResponse(
+        status_code=422,
+        content={"detail": f"{field}: {message}"}
+    )
 
 # Injeção de dependência do banco
 def get_db():
@@ -124,6 +156,28 @@ def get_business_by_slug(slug: str, db: Session = Depends(get_db)):
 
 @app.post("/client", status_code=status.HTTP_201_CREATED)
 def create_client(client: ClientCreate, db: Session = Depends(get_db)):
+    business = db.query(Business).filter(Business.id == client.business_id).first()
+    if not business:
+        raise HTTPException(status_code=404, detail="Estabelecimento não encontrado.")
+
+    # Se já existe um cliente com esse telefone nesse estabelecimento, não duplica o
+    # cadastro — apenas avisa que a pessoa já pode agendar direto no passo 2.
+    digits_only = lambda s: re.sub(r"\D", "", s)
+    existing_client = next(
+        (
+            c for c in db.query(Client).filter(Client.business_id == client.business_id).all()
+            if digits_only(c.phone) == digits_only(client.phone)
+        ),
+        None
+    )
+    if existing_client:
+        return {
+            "message": f"Esse telefone já está cadastrado como {existing_client.name}. "
+                       f"Pode selecionar seu nome direto no passo 2, sem cadastrar de novo!",
+            "client_id": existing_client.id,
+            "already_registered": True
+        }
+
     new_client = Client(
         business_id=client.business_id,
         name=client.name,
@@ -132,34 +186,74 @@ def create_client(client: ClientCreate, db: Session = Depends(get_db)):
     db.add(new_client)
     db.commit()
     db.refresh(new_client)
-    return {"message": "Cliente cadastrado com sucesso!", "client_id": new_client.id}
+    return {"message": "Cliente cadastrado com sucesso!", "client_id": new_client.id, "already_registered": False}
+
+
+ALL_TIMES = [
+    "08:00", "09:00", "10:00", "11:00", "12:00",
+    "13:00", "14:00", "15:00", "16:00", "17:00"
+]
 
 
 @app.get("/available-times/{business_id}/{date}")
 def available_times(business_id: int, date: str, db: Session = Depends(get_db)):
-    all_times = [
-        "08:00", "09:00", "10:00", "11:00", "12:00",
-        "13:00", "14:00", "15:00", "16:00", "17:00"
-    ]
+    try:
+        parsed_date = datetime.strptime(date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Data inválida. Use o formato AAAA-MM-DD.")
+
+    if parsed_date < datetime.now().date():
+        return []
 
     appointments_day = db.query(Appointment).filter(
         Appointment.business_id == business_id,
         Appointment.date == date
     ).all()
-    
+
     occupied_times = [ap.time for ap in appointments_day]
-    available = [tm for tm in all_times if tm not in occupied_times]
+    available = [tm for tm in ALL_TIMES if tm not in occupied_times]
     return available
 
 
 @app.post("/appointment", status_code=status.HTTP_201_CREATED)
 def create_appointment(appointment: AppointmentCreate, db: Session = Depends(get_db)):
+    business = db.query(Business).filter(Business.id == appointment.business_id).first()
+    if not business:
+        raise HTTPException(status_code=404, detail="Estabelecimento não encontrado.")
+
+    client = db.query(Client).filter(
+        Client.id == appointment.client_id,
+        Client.business_id == appointment.business_id
+    ).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado neste estabelecimento.")
+
+    # Confirma que quem está agendando é realmente o dono do cadastro,
+    # comparando só os dígitos do telefone (ignora espaços, parênteses e traços).
+    digits_only = lambda s: re.sub(r"\D", "", s)
+    if digits_only(appointment.phone) != digits_only(client.phone):
+        raise HTTPException(
+            status_code=403,
+            detail="O telefone informado não confere com o cadastro deste cliente."
+        )
+
+    if appointment.time not in ALL_TIMES:
+        raise HTTPException(status_code=400, detail="Horário inválido.")
+
+    try:
+        parsed_date = datetime.strptime(appointment.date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Data inválida. Use o formato AAAA-MM-DD.")
+
+    if parsed_date < datetime.now().date():
+        raise HTTPException(status_code=400, detail="Não é possível agendar em uma data passada.")
+
     existing = db.query(Appointment).filter(
         Appointment.business_id == appointment.business_id,
         Appointment.date == appointment.date,
         Appointment.time == appointment.time
     ).first()
-    
+
     if existing:
         raise HTTPException(status_code=400, detail="Horário já ocupado nesta empresa.")
 
@@ -231,3 +325,8 @@ def delete_appointment(
     db.delete(appointment)
     db.commit()
     return {"message": "Agendamento cancelado com sucesso!"}
+
+@app.get("/clients/public/{business_id}")
+def list_public_clients(business_id: int, db: Session = Depends(get_db)):
+    clients = db.query(Client).filter(Client.business_id == business_id).all()
+    return [{"id": c.id, "name": c.name} for c in clients]

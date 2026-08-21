@@ -51,12 +51,19 @@ function loadClients() {
             deleteButton.innerText = "🗑"
 
             clientCard.classList.add("client-card")
-            clientCard.innerHTML = `
-                <div class="card-info">
-                    <h3>👤 ${client.name}</h3>
-                    <p>📞 ${client.phone}</p>
-                </div>
-            `
+
+            const info = document.createElement("div")
+            info.classList.add("card-info")
+
+            const nameEl = document.createElement("h3")
+            nameEl.textContent = `👤 ${client.name}`
+
+            const phoneEl = document.createElement("p")
+            phoneEl.textContent = `📞 ${client.phone}`
+
+            info.appendChild(nameEl)
+            info.appendChild(phoneEl)
+            clientCard.appendChild(info)
             clientCard.appendChild(deleteButton)
             clientsList.appendChild(clientCard)
 
@@ -101,13 +108,20 @@ function loadAppointments() {
             const search = searchAppointment ? searchAppointment.value.toLowerCase() : ""
             if (!clientName.toLowerCase().includes(search)) return
 
-            appointmentCard.innerHTML = `
-                <div class="card-info">
-                    <h3>📅 ${clientName}</h3>
-                    <p>🗓 ${appointment.date}</p>
-                    <p>🕒 ${appointment.time}</p>
-                </div>
-            `
+            const info = document.createElement("div")
+            info.classList.add("card-info")
+
+            const nameEl = document.createElement("h3")
+            nameEl.textContent = `📅 ${clientName}`
+            const dateEl = document.createElement("p")
+            dateEl.textContent = `🗓 ${appointment.date}`
+            const timeEl = document.createElement("p")
+            timeEl.textContent = `🕒 ${appointment.time}`
+
+            info.appendChild(nameEl)
+            info.appendChild(dateEl)
+            info.appendChild(timeEl)
+            appointmentCard.appendChild(info)
             appointmentCard.appendChild(deleteButton)
 
             deleteButton.addEventListener("click", function() {

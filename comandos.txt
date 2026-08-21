@@ -5,3 +5,4 @@ Base.metadata.create_all(bind=engine)
 (git add .)
 (git commit -m "mensagem")
 (git push)
+pip install "pydantic[email]"

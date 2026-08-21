@@ -1,132 +1,68 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="pt-BR">
 <head>
-    
-    <title>Sou Cliente</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin>
-
-    <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento - Agenda Pro</title>
     <link rel="stylesheet" href="style.css">
+    <script src="config.js?v=2"></script>
 </head>
-
 <body>
+    <div class="customer-wrapper">
+        <header class="customer-header">
+            <button class="back-button" onclick="window.location.href='index.html'">← Voltar</button>
+            <div class="logo">Agenda <span>Pro</span></div>
+            <h1 id="business-display-name" style="margin-top: 15px; font-size: 24px;">Carregando estabelecimento...</h1>
+        </header>
 
-<div class="customer-wrapper">
-
-    <div class="customer-header">
-            
-        <button
-            class="back-button"
-            onclick="window.location.href='index.html'">
-
-            ← Início
-
-        </button>
-
-        <h1 class="logo">
-
-            Agenda <span>Pro</span>
-
-        </h1>
-
-        <p class="subtitle">
-
-            Agende seu horário em poucos segundos.
-
-        </p>
-
-    </div>
-
-
-    <div class="customer-container">
-
-
-        <div class="form-card">
-
-            <h2>👤 Cadastro</h2>
-
-            <p class="section-description">
-                Informe seus dados para criar seu cadastro.
-            </p>
-
-            <p>Nome</p>
-        
-            <input id="name" class="input_field">
-        
-            <p>Telefone</p>
-            <input id="phone" class="input_field">
-            
-            <button
-            type="button"
-            id="register-client-button"
-            class="register-button">
-
-            Cadastrar
-
-            </button>
-
+        <div id="select-business-section" class="form-card" style="display: none; margin-bottom: 25px;">
+            <h2>Buscar Estabelecimento</h2>
+            <p class="section-description">Digite o nome ou selecione o local onde deseja agendar:</p>
+            <input type="text" id="search-business-input" class="input_field" placeholder="Ex: Barbearia Silva">
+            <p id="business-search-status" style="font-size: 14px; color: #2563EB; font-weight: 600;"></p>
         </div>
 
-        
-        <div class="form-card">
+        <main class="customer-container">
+            <section class="form-card">
+                <h2>1. Primeira vez aqui?</h2>
+                <p class="section-description">Se for seu primeiro agendamento neste estabelecimento, cadastre seu nome e telefone abaixo. Se você já é cliente, pode pular direto para o passo 2 e selecionar seu nome na lista.</p>
+                <form id="client-form">
+                    <input type="text" id="client-name" class="input_field" placeholder="Seu nome completo" required>
+                    <input type="tel" id="client-phone" class="input_field" placeholder="Seu WhatsApp" required>
+                    <button type="submit" class="register-button" id="submit-client-btn" disabled>Cadastrar Cliente</button>
+                </form>
+            </section>
 
-            <h2>📅 Agendamento</h2>
+            <section class="form-card">
+                <h2>2. Escolha a Data e Horário</h2>
+                <p class="section-description">Selecione seu nome na lista e escolha um horário disponível.</p>
+                
+                <form id="appointment-form">
+                    <label style="display:block; margin-bottom: 8px; font-weight: 600;">Selecione seu Nome na Lista</label>
+                    <select id="client-select" class="input_field" required>
+                        <option value="">Carregando clientes...</option>
+                    </select>
 
-            <p class="section-description">
-                Escolha a data e o horário disponível
-            </p>
+                    <label style="display:block; margin-bottom: 8px; font-weight: 600;">Confirme seu WhatsApp</label>
+                    <input type="tel" id="confirm-phone" class="input_field" placeholder="O mesmo número do seu cadastro" required>
 
-            <p>Clientes</p>
+                    <label style="display:block; margin-bottom: 8px; font-weight: 600;">Data do Agendamento</label>
+                    <input type="date" id="appointment-date" class="input_field" required>
 
-            <select id="client-select" class="input_field">
-            </select>
+                    <label style="display:block; margin-bottom: 8px; font-weight: 600;">Horários Disponíveis</label>
+                    <select id="time-select" class="input_field" required disabled>
+                        <option value="">Selecione uma data primeiro</option>
+                    </select>
 
-            <p>Data</p>
-
-            <input
-            type="date"
-            id="date"
-            class="input_field">
-
-            <p>Horário</p>
-
-            <select
-            id="time"
-            class="input_field">
-            </select>
-
-            <button
-
-            type="button"
-            id="create-appointment-button"
-            class="register-button">
-
-            Criar agendamento
-
-            </button>
-
-
-        </div>
-
-
+                    <button type="submit" id="submit-appointment-btn" class="register-button" disabled>Confirmar Agendamento</button>
+                </form>
+            </section>
+        </main>
     </div>
-</div>
 
-    <script src="config.js"></script>
     <div id="toast"></div>
-    <script src="toast.js"></script>
-    <script src="clients.js"></script>
-    <script src="appointments.js"></script>
-
+    <script src="toast.js?v=2"></script>
+    <script src="clients.js?v=2"></script>
+    <script src="appointments.js?v=2"></script>
 </body>
-
 </html>
