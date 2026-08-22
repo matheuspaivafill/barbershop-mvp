@@ -217,6 +217,28 @@ p {
 
     margin-bottom:40px;
 
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid #ccc;
+    color: #555;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.btn-secondary:hover {
+    background: #f2f2f2;
+    border-color: #999;
 }
 
 .dashboard-description{

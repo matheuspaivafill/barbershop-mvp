@@ -6,11 +6,14 @@ const searchBusinessInput = document.getElementById("search-business-input")
 const businessSearchStatus = document.getElementById("business-search-status")
 
 const appointmentForm = document.getElementById("appointment-form")
-const clientSelect = document.getElementById("client-select")
 const confirmPhone = document.getElementById("confirm-phone")
+const clientFoundMsg = document.getElementById("client-found-msg")
 const appointmentDate = document.getElementById("appointment-date")
 const timeSelect = document.getElementById("time-select")
 const submitAppointmentBtn = document.getElementById("submit-appointment-btn")
+
+// Guarda o id do cliente encontrado pela busca do telefone
+window.foundClientId = null
 
 function initBusinessContext() {
     const urlParams = new URLSearchParams(window.location.search)
@@ -47,7 +50,6 @@ function setBusiness(id, name) {
     sessionStorage.setItem("selectedBusinessName", name)
     businessDisplayName.innerText = `Agendando em: ${name}`
     selectBusinessSection.style.display = "none"
-    loadClients()
     const submitClientBtn = document.getElementById("submit-client-btn")
     if (submitClientBtn) submitClientBtn.disabled = false
 }
@@ -58,22 +60,37 @@ function showBusinessSearch(message = "") {
     if (message) businessSearchStatus.innerText = message
 }
 
-// Busca a lista de clientes cadastrados no estabelecimento atual
-function loadClients() {
-    if (!window.currentBusinessId || !clientSelect) return
+// Busca o cliente pelo telefone digitado, assim que a pessoa termina de digitar
+let lookupTimeout = null
+if (confirmPhone) {
+    confirmPhone.addEventListener("input", function() {
+        window.foundClientId = null
+        clientFoundMsg.innerText = ""
+        clientFoundMsg.style.color = ""
 
-    fetch(`${API_URL}/clients/public/${window.currentBusinessId}`)
-    .then(res => res.json())
-    .then(clients => {
-        clientSelect.innerHTML = '<option value="">Selecione seu nome</option>'
-        clients.forEach(client => {
-            const option = document.createElement("option")
-            option.value = client.id
-            option.innerText = client.name
-            clientSelect.appendChild(option)
-        })
+        clearTimeout(lookupTimeout)
+        const phone = confirmPhone.value.trim()
+        if (!window.currentBusinessId || phone.replace(/\D/g, "").length < 8) return
+
+        lookupTimeout = setTimeout(() => {
+            fetch(`${API_URL}/client/lookup?business_id=${window.currentBusinessId}&phone=${encodeURIComponent(phone)}`)
+            .then(async res => {
+                const data = await res.json()
+                if (!res.ok) throw new Error(data.detail || "Cadastro não encontrado")
+                return data
+            })
+            .then(data => {
+                window.foundClientId = data.client_id
+                clientFoundMsg.innerText = `✓ Agendando para ${data.name}`
+                clientFoundMsg.style.color = "green"
+            })
+            .catch(error => {
+                window.foundClientId = null
+                clientFoundMsg.innerText = "Não encontramos esse telefone. Cadastre-se no passo 1 primeiro."
+                clientFoundMsg.style.color = "#c0392b"
+            })
+        }, 500)
     })
-    .catch(err => console.error(err))
 }
 
 if (searchBusinessInput) {
@@ -129,8 +146,8 @@ appointmentDate.addEventListener("change", function() {
 appointmentForm.addEventListener("submit", function(event) {
     event.preventDefault()
 
-    if (!window.currentBusinessId || !clientSelect.value || !confirmPhone.value.trim() || !appointmentDate.value || !timeSelect.value) {
-        showToast("Preencha todos os campos do agendamento.", true)
+    if (!window.currentBusinessId || !window.foundClientId || !confirmPhone.value.trim() || !appointmentDate.value || !timeSelect.value) {
+        showToast("Preencha o telefone (aguarde a confirmação do nome), data e horário.", true)
         return
     }
 
@@ -139,7 +156,7 @@ appointmentForm.addEventListener("submit", function(event) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             business_id: window.currentBusinessId,
-            client_id: parseInt(clientSelect.value),
+            client_id: window.foundClientId,
             phone: confirmPhone.value.trim(),
             date: appointmentDate.value,
             time: timeSelect.value
@@ -154,6 +171,8 @@ appointmentForm.addEventListener("submit", function(event) {
         showToast("Agendamento realizado com sucesso!")
         appointmentForm.reset()
         confirmPhone.value = ""
+        clientFoundMsg.innerText = ""
+        window.foundClientId = null
         timeSelect.disabled = true
         submitAppointmentBtn.disabled = true
     })

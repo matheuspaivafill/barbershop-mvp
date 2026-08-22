@@ -29,12 +29,14 @@ if (clientForm) {
             showToast(data.message)
 
             clientName.value = ""
-            clientPhone.value = ""
 
-            // Recarrega a lista de clientes no dropdown
-            if (typeof loadClients === "function") {
-                loadClients()
+            // Preenche automaticamente o telefone no passo 2, pra não ter que digitar de novo
+            const confirmPhoneField = document.getElementById("confirm-phone")
+            if (confirmPhoneField) {
+                confirmPhoneField.value = clientPhone.value.trim()
+                confirmPhoneField.dispatchEvent(new Event("input"))
             }
+            clientPhone.value = ""
         })
         .catch(error => {
             console.error(error)

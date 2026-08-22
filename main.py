@@ -154,6 +154,33 @@ def get_business_by_slug(slug: str, db: Session = Depends(get_db)):
 
 # --- ROTAS PÚBLICAS DO CLIENTE (Para agendamento na página pública) ---
 
+def digits_only(s: str) -> str:
+    return re.sub(r"\D", "", s)
+
+
+def find_client_by_phone(db: Session, business_id: int, phone: str):
+    target = digits_only(phone)
+    return next(
+        (
+            c for c in db.query(Client).filter(Client.business_id == business_id).all()
+            if digits_only(c.phone) == target
+        ),
+        None
+    )
+
+
+@app.get("/client/lookup")
+def lookup_client(business_id: int, phone: str, db: Session = Depends(get_db)):
+    if len(digits_only(phone)) < 8:
+        raise HTTPException(status_code=400, detail="Telefone incompleto.")
+
+    client = find_client_by_phone(db, business_id, phone)
+    if not client:
+        raise HTTPException(status_code=404, detail="Nenhum cadastro encontrado com esse telefone.")
+
+    return {"client_id": client.id, "name": client.name}
+
+
 @app.post("/client", status_code=status.HTTP_201_CREATED)
 def create_client(client: ClientCreate, db: Session = Depends(get_db)):
     business = db.query(Business).filter(Business.id == client.business_id).first()
@@ -162,18 +189,11 @@ def create_client(client: ClientCreate, db: Session = Depends(get_db)):
 
     # Se já existe um cliente com esse telefone nesse estabelecimento, não duplica o
     # cadastro — apenas avisa que a pessoa já pode agendar direto no passo 2.
-    digits_only = lambda s: re.sub(r"\D", "", s)
-    existing_client = next(
-        (
-            c for c in db.query(Client).filter(Client.business_id == client.business_id).all()
-            if digits_only(c.phone) == digits_only(client.phone)
-        ),
-        None
-    )
+    existing_client = find_client_by_phone(db, client.business_id, client.phone)
     if existing_client:
         return {
             "message": f"Esse telefone já está cadastrado como {existing_client.name}. "
-                       f"Pode selecionar seu nome direto no passo 2, sem cadastrar de novo!",
+                       f"Pode agendar direto no passo 2, sem cadastrar de novo!",
             "client_id": existing_client.id,
             "already_registered": True
         }
@@ -230,7 +250,6 @@ def create_appointment(appointment: AppointmentCreate, db: Session = Depends(get
 
     # Confirma que quem está agendando é realmente o dono do cadastro,
     # comparando só os dígitos do telefone (ignora espaços, parênteses e traços).
-    digits_only = lambda s: re.sub(r"\D", "", s)
     if digits_only(appointment.phone) != digits_only(client.phone):
         raise HTTPException(
             status_code=403,
@@ -328,5 +347,7 @@ def delete_appointment(
 
 @app.get("/clients/public/{business_id}")
 def list_public_clients(business_id: int, db: Session = Depends(get_db)):
-    clients = db.query(Client).filter(Client.business_id == business_id).all()
-    return [{"id": c.id, "name": c.name} for c in clients]
+    # Removido: essa rota expunha nome de todos os clientes de um estabelecimento
+    # publicamente, sem autenticação. Não é mais usada — a identificação do
+    # cliente no agendamento agora é feita via /client/lookup, por telefone.
+    raise HTTPException(status_code=410, detail="Rota descontinuada.")

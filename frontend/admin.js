@@ -4,6 +4,31 @@ if (!token) {
     window.location.href = "login.html"
 }
 
+const logoutBtn = document.getElementById("logout-btn")
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", function() {
+        localStorage.clear()
+        window.location.href = "login.html"
+    })
+}
+
+// Monta e exibe o link de agendamento público desse estabelecimento
+const shareLinkInput = document.getElementById("share-link-input")
+const copyLinkBtn = document.getElementById("copy-link-btn")
+if (shareLinkInput) {
+    const slug = localStorage.getItem("slug")
+    const customerPageUrl = window.location.href.replace(/admin\.html.*$/, "customer.html")
+    shareLinkInput.value = slug ? `${customerPageUrl}?slug=${slug}` : "Link indisponível — faça login novamente."
+}
+if (copyLinkBtn) {
+    copyLinkBtn.addEventListener("click", function() {
+        shareLinkInput.select()
+        navigator.clipboard.writeText(shareLinkInput.value)
+            .then(() => showToast("Link copiado!"))
+            .catch(() => showToast("Não foi possível copiar. Copie manualmente.", true))
+    })
+}
+
 const clientsList = document.getElementById("clients-list")
 const appointmentsList = document.getElementById("appointments-list")
 const totalClients = document.getElementById("total-clients")
