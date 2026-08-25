@@ -1,6 +1,7 @@
 window.currentBusinessId = null
 
 const businessDisplayName = document.getElementById("business-display-name")
+const switchBusinessBtn = document.getElementById("switch-business-btn")
 const selectBusinessSection = document.getElementById("select-business-section")
 const searchBusinessInput = document.getElementById("search-business-input")
 const businessSearchStatus = document.getElementById("business-search-status")
@@ -50,6 +51,7 @@ function setBusiness(id, name) {
     sessionStorage.setItem("selectedBusinessName", name)
     businessDisplayName.innerText = `Agendando em: ${name}`
     selectBusinessSection.style.display = "none"
+    if (switchBusinessBtn) switchBusinessBtn.style.display = "inline-block"
     const submitClientBtn = document.getElementById("submit-client-btn")
     if (submitClientBtn) submitClientBtn.disabled = false
 }
@@ -57,7 +59,17 @@ function setBusiness(id, name) {
 function showBusinessSearch(message = "") {
     businessDisplayName.innerText = "Agendamento Online"
     selectBusinessSection.style.display = "block"
+    if (switchBusinessBtn) switchBusinessBtn.style.display = "none"
     if (message) businessSearchStatus.innerText = message
+}
+
+if (switchBusinessBtn) {
+    switchBusinessBtn.addEventListener("click", function() {
+        sessionStorage.removeItem("selectedBusinessId")
+        sessionStorage.removeItem("selectedBusinessName")
+        window.currentBusinessId = null
+        showBusinessSearch()
+    })
 }
 
 // Busca o cliente pelo telefone digitado, assim que a pessoa termina de digitar
