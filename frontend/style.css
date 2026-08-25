@@ -16,6 +16,14 @@ body {
 
     margin: 0;
 
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
     background: #C8CACF;
 
     font-family: "Inter", sans-serif;
@@ -72,7 +80,7 @@ p {
 
     max-width: 900px;
 
-    margin: 50px auto;
+    margin: 30px auto;
 
     padding: 50px 35px;
 
@@ -102,7 +110,7 @@ p {
 
     max-width: 900px;
 
-    margin: 50px auto;
+    margin: 30px auto;
 
     padding: 50px 35px;
 
@@ -622,6 +630,40 @@ footer{
     .action-button{
 
         width:100%;
+
+    }
+
+    body {
+
+        align-items: flex-start;
+
+        padding: 16px 0;
+
+        box-sizing: border-box;
+
+    }
+
+    .home-container,
+    .admin-container,
+    .customer-wrapper {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        margin: 0;
+
+        padding: 28px 20px;
+
+        border-radius: 16px;
+
+    }
+
+    .dashboard-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
 
     }
 
