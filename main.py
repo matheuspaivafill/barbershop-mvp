@@ -6,7 +6,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
+import bcrypt
 
 from database import engine, Base, SessionLocal
 from models import Business, Client, Appointment
@@ -22,8 +22,6 @@ if not SECRET_KEY:
         "antes de subir o servidor (nunca use uma chave fixa em produção)."
     )
 ALGORITHM = "HS256"
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Lista de origens autorizadas a chamar a API (troque pelo domínio real em produção)
 ALLOWED_ORIGINS = os.environ.get(
@@ -69,11 +67,17 @@ def get_db():
 
 # Função auxiliar para gerar hash de senha
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    # bcrypt só aceita até 72 bytes — cortamos por segurança, sem quebrar em produção
+    password_bytes = password.encode("utf-8")[:72]
+    return bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode("utf-8")
 
 # Função auxiliar para verificar senha
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    password_bytes = plain_password.encode("utf-8")[:72]
+    try:
+        return bcrypt.checkpw(password_bytes, hashed_password.encode("utf-8"))
+    except ValueError:
+        return False
 
 # Função auxiliar para criar Token JWT
 def create_access_token(data: dict):
