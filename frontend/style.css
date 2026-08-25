@@ -615,69 +615,6 @@ footer{
 
 }
 
-@media (max-width:768px){
-
-    .section-header{
-
-        flex-direction:column;
-
-        align-items:flex-start;
-
-        gap:15px;
-
-    }
-
-    .action-button{
-
-        width:100%;
-
-    }
-
-    body {
-
-        align-items: flex-start;
-
-        padding: 0;
-
-        margin: 0;
-
-        box-sizing: border-box;
-
-    }
-
-    .home-container,
-    .admin-container,
-    .customer-wrapper {
-
-        width: 100%;
-
-        max-width: 100%;
-
-        min-height: 100vh;
-
-        min-height: 100dvh;
-
-        margin: 0;
-
-        padding: 28px 20px 40px;
-
-        border-radius: 0;
-
-        box-shadow: none;
-
-        box-sizing: border-box;
-
-    }
-
-    .dashboard-header {
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-    }
-
-}
 
 #toast{
 
@@ -813,5 +750,68 @@ footer{
     padding:45px;
 
     box-shadow:0 15px 35px rgba(0,0,0,.08);
+
+}
+@media (max-width:768px){
+
+    .section-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:15px;
+
+    }
+
+    .action-button{
+
+        width:100%;
+
+    }
+
+    body {
+
+        align-items: flex-start;
+
+        padding: 0;
+
+        margin: 0;
+
+        box-sizing: border-box;
+
+    }
+
+    .home-container,
+    .admin-container,
+    .customer-wrapper {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        min-height: 100vh;
+
+        min-height: 100dvh;
+
+        margin: 0;
+
+        padding: 28px 20px 40px;
+
+        border-radius: 0;
+
+        box-shadow: none;
+
+        box-sizing: border-box;
+
+    }
+
+    .dashboard-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
 
 }
