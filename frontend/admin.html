@@ -7,7 +7,7 @@
 
     <title>Administração</title>
 
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -50,6 +50,13 @@
         <button id="logout-btn" class="btn-secondary" type="button">Sair</button>
 
     </div>
+
+    <div class="tabs-nav" style="display:flex; gap:10px; margin-bottom:25px; border-bottom:1px solid #e5e7eb;">
+        <button id="tab-btn-overview" class="tab-button active" type="button">Clientes e Agendamentos</button>
+        <button id="tab-btn-schedule" class="tab-button" type="button">Horários e Bloqueios</button>
+    </div>
+
+    <div id="tab-overview">
 
     <div class="dashboard">
 
@@ -114,7 +121,7 @@
         <input
             type="text"
             id="search-client"
-            placeholder="🔍 Pesquisar cliente...">
+            placeholder="Pesquisar cliente...">
 
     </div>
 
@@ -143,14 +150,77 @@
         <input
             type="text"
             id="search-appointment"
-            placeholder="🔍 Pesquisar agendamento...">
+            placeholder="Pesquisar agendamento...">
 
     </div>
 
     <div id="appointments-list"></div>
 
+    </div>
+
+    <div id="tab-schedule" style="display:none;">
+
+        <div class="section-header">
+            <h2>Horário de Atendimento</h2>
+        </div>
+        <p class="section-description">Escolha os dias e o intervalo de horário em que seu estabelecimento atende. Os agendamentos só ficam disponíveis dentro dessa janela.</p>
+
+        <div id="working-days-picker" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;">
+            <label class="day-checkbox"><input type="checkbox" value="0"> Seg</label>
+            <label class="day-checkbox"><input type="checkbox" value="1"> Ter</label>
+            <label class="day-checkbox"><input type="checkbox" value="2"> Qua</label>
+            <label class="day-checkbox"><input type="checkbox" value="3"> Qui</label>
+            <label class="day-checkbox"><input type="checkbox" value="4"> Sex</label>
+            <label class="day-checkbox"><input type="checkbox" value="5"> Sáb</label>
+            <label class="day-checkbox"><input type="checkbox" value="6"> Dom</label>
+        </div>
+
+        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:10px;">
+            <div style="flex:1; min-width:140px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Início do atendimento</label>
+                <input type="time" id="schedule-start-time" class="input_field">
+            </div>
+            <div style="flex:1; min-width:140px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Fim do atendimento</label>
+                <input type="time" id="schedule-end-time" class="input_field">
+            </div>
+        </div>
+
+        <button id="save-schedule-btn" class="action-button" type="button">Salvar Horário</button>
+
+        <hr class="section-divider">
+
+        <div class="section-header">
+            <h2>Bloquear Dias e Horários</h2>
+        </div>
+        <p class="section-description">Bloqueie um dia inteiro (ex: uma viagem) ou só um horário específico (ex: já foi marcado por telefone).</p>
+
+        <div style="display:flex; gap:15px; flex-wrap:wrap; align-items:flex-end; margin-bottom:15px;">
+            <div style="flex:1; min-width:140px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Data</label>
+                <input type="date" id="block-date" class="input_field" style="margin-bottom:0;">
+            </div>
+            <div style="flex:1; min-width:140px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Horário (opcional)</label>
+                <input type="time" id="block-time" class="input_field" style="margin-bottom:0;">
+            </div>
+            <div style="flex:2; min-width:180px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Motivo (opcional)</label>
+                <input type="text" id="block-reason" class="input_field" placeholder="Ex: Viagem" style="margin-bottom:0;">
+            </div>
+        </div>
+        <p class="section-description" style="margin-top:-8px;">Deixe o horário em branco para bloquear o dia inteiro.</p>
+
+        <button id="create-block-btn" class="action-button" type="button">Bloquear</button>
+
+        <h3 style="margin-top:25px;">Bloqueios ativos</h3>
+        <div id="blocked-slots-list"></div>
+
+    </div>
+
         <button
             class="register-button"
+            type="button"
             onclick="window.location.href='index.html'">
 
             ← Voltar
@@ -162,8 +232,7 @@
         <script src="config.js?v=2"></script>
         <div id="toast"></div>
         <script src="toast.js?v=2"></script>
-        <script src="admin.js?v=2"></script>
-        <div id="toast"></div>
+        <script src="admin.js?v=4"></script>
 
 </body>
 

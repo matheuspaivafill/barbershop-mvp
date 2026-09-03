@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 import bcrypt
 
 from database import engine, Base, SessionLocal
-from models import Business, Client, Appointment
-from schemas import BusinessCreate, BusinessLogin, ClientCreate, AppointmentCreate
+from models import Business, Client, Appointment, BlockedSlot
+from schemas import BusinessCreate, BusinessLogin, ClientCreate, AppointmentCreate, ScheduleUpdate, BlockedSlotCreate
 
 # Configurações de Segurança
 import os
@@ -213,14 +213,28 @@ def create_client(client: ClientCreate, db: Session = Depends(get_db)):
     return {"message": "Cliente cadastrado com sucesso!", "client_id": new_client.id, "already_registered": False}
 
 
-ALL_TIMES = [
-    "08:00", "09:00", "10:00", "11:00", "12:00",
-    "13:00", "14:00", "15:00", "16:00", "17:00"
-]
+def generate_time_slots(start_time: str, end_time: str) -> list[str]:
+    """Gera os horários de hora em hora entre o início e o fim configurados."""
+    start_h = int(start_time.split(":")[0])
+    end_h = int(end_time.split(":")[0])
+    return [f"{h:02d}:00" for h in range(start_h, end_h)]
+
+
+def get_business_day_blocked(db: Session, business_id: int, date: str) -> bool:
+    """Verifica se o DIA INTEIRO está bloqueado pro estabelecimento."""
+    return db.query(BlockedSlot).filter(
+        BlockedSlot.business_id == business_id,
+        BlockedSlot.date == date,
+        BlockedSlot.time.is_(None)
+    ).first() is not None
 
 
 @app.get("/available-times/{business_id}/{date}")
 def available_times(business_id: int, date: str, db: Session = Depends(get_db)):
+    business = db.query(Business).filter(Business.id == business_id).first()
+    if not business:
+        raise HTTPException(status_code=404, detail="Estabelecimento não encontrado.")
+
     try:
         parsed_date = datetime.strptime(date, "%Y-%m-%d").date()
     except ValueError:
@@ -229,13 +243,30 @@ def available_times(business_id: int, date: str, db: Session = Depends(get_db)):
     if parsed_date < datetime.now().date():
         return []
 
+    # weekday(): 0=Segunda ... 6=Domingo (mesmo padrão usado em working_days)
+    working_days = [int(d) for d in business.working_days.split(",")]
+    if parsed_date.weekday() not in working_days:
+        return []
+
+    if get_business_day_blocked(db, business_id, date):
+        return []
+
+    all_times = generate_time_slots(business.start_time, business.end_time)
+
     appointments_day = db.query(Appointment).filter(
         Appointment.business_id == business_id,
         Appointment.date == date
     ).all()
+    occupied_times = {ap.time for ap in appointments_day}
 
-    occupied_times = [ap.time for ap in appointments_day]
-    available = [tm for tm in ALL_TIMES if tm not in occupied_times]
+    blocked_slots_day = db.query(BlockedSlot).filter(
+        BlockedSlot.business_id == business_id,
+        BlockedSlot.date == date,
+        BlockedSlot.time.isnot(None)
+    ).all()
+    blocked_times = {b.time for b in blocked_slots_day}
+
+    available = [tm for tm in all_times if tm not in occupied_times and tm not in blocked_times]
     return available
 
 
@@ -260,9 +291,6 @@ def create_appointment(appointment: AppointmentCreate, db: Session = Depends(get
             detail="O telefone informado não confere com o cadastro deste cliente."
         )
 
-    if appointment.time not in ALL_TIMES:
-        raise HTTPException(status_code=400, detail="Horário inválido.")
-
     try:
         parsed_date = datetime.strptime(appointment.date, "%Y-%m-%d").date()
     except ValueError:
@@ -270,6 +298,25 @@ def create_appointment(appointment: AppointmentCreate, db: Session = Depends(get
 
     if parsed_date < datetime.now().date():
         raise HTTPException(status_code=400, detail="Não é possível agendar em uma data passada.")
+
+    working_days = [int(d) for d in business.working_days.split(",")]
+    if parsed_date.weekday() not in working_days:
+        raise HTTPException(status_code=400, detail="O estabelecimento não atende nesse dia da semana.")
+
+    if get_business_day_blocked(db, business.id, appointment.date):
+        raise HTTPException(status_code=400, detail="O estabelecimento não está atendendo nessa data.")
+
+    all_times = generate_time_slots(business.start_time, business.end_time)
+    if appointment.time not in all_times:
+        raise HTTPException(status_code=400, detail="Horário fora do funcionamento do estabelecimento.")
+
+    slot_blocked = db.query(BlockedSlot).filter(
+        BlockedSlot.business_id == business.id,
+        BlockedSlot.date == appointment.date,
+        BlockedSlot.time == appointment.time
+    ).first()
+    if slot_blocked:
+        raise HTTPException(status_code=400, detail="Esse horário não está disponível.")
 
     existing = db.query(Appointment).filter(
         Appointment.business_id == appointment.business_id,
@@ -355,3 +402,97 @@ def list_public_clients(business_id: int, db: Session = Depends(get_db)):
     # publicamente, sem autenticação. Não é mais usada — a identificação do
     # cliente no agendamento agora é feita via /client/lookup, por telefone.
     raise HTTPException(status_code=410, detail="Rota descontinuada.")
+
+
+# --- CONFIGURAÇÃO DE HORÁRIO DE ATENDIMENTO (Área administrativa) ---
+
+@app.get("/schedule")
+def get_schedule(current_business: Business = Depends(get_current_business)):
+    return {
+        "working_days": current_business.working_days,
+        "start_time": current_business.start_time,
+        "end_time": current_business.end_time
+    }
+
+
+@app.put("/schedule")
+def update_schedule(
+    schedule: ScheduleUpdate,
+    current_business: Business = Depends(get_current_business),
+    db: Session = Depends(get_db)
+):
+    start_h = int(schedule.start_time.split(":")[0])
+    end_h = int(schedule.end_time.split(":")[0])
+    if end_h <= start_h:
+        raise HTTPException(status_code=400, detail="O horário de término deve ser depois do horário de início.")
+
+    current_business.working_days = schedule.working_days
+    current_business.start_time = schedule.start_time
+    current_business.end_time = schedule.end_time
+    db.commit()
+    return {"message": "Horário de atendimento atualizado com sucesso!"}
+
+
+# --- BLOQUEIO DE DIAS E HORÁRIOS (Área administrativa) ---
+
+@app.get("/blocked-slots")
+def list_blocked_slots(
+    current_business: Business = Depends(get_current_business),
+    db: Session = Depends(get_db)
+):
+    slots = db.query(BlockedSlot).filter(
+        BlockedSlot.business_id == current_business.id
+    ).order_by(BlockedSlot.date).all()
+    return [
+        {"id": s.id, "date": s.date, "time": s.time, "reason": s.reason}
+        for s in slots
+    ]
+
+
+@app.post("/blocked-slots", status_code=status.HTTP_201_CREATED)
+def create_blocked_slot(
+    blocked: BlockedSlotCreate,
+    current_business: Business = Depends(get_current_business),
+    db: Session = Depends(get_db)
+):
+    try:
+        datetime.strptime(blocked.date, "%Y-%m-%d")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Data inválida. Use o formato AAAA-MM-DD.")
+
+    existing = db.query(BlockedSlot).filter(
+        BlockedSlot.business_id == current_business.id,
+        BlockedSlot.date == blocked.date,
+        BlockedSlot.time == blocked.time
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Esse dia/horário já está bloqueado.")
+
+    new_block = BlockedSlot(
+        business_id=current_business.id,
+        date=blocked.date,
+        time=blocked.time,
+        reason=blocked.reason
+    )
+    db.add(new_block)
+    db.commit()
+    db.refresh(new_block)
+    return {"message": "Bloqueio criado com sucesso!", "id": new_block.id}
+
+
+@app.delete("/blocked-slots/{block_id}")
+def delete_blocked_slot(
+    block_id: int,
+    current_business: Business = Depends(get_current_business),
+    db: Session = Depends(get_db)
+):
+    block = db.query(BlockedSlot).filter(
+        BlockedSlot.id == block_id,
+        BlockedSlot.business_id == current_business.id
+    ).first()
+    if not block:
+        raise HTTPException(status_code=404, detail="Bloqueio não encontrado.")
+
+    db.delete(block)
+    db.commit()
+    return {"message": "Bloqueio removido com sucesso!"}

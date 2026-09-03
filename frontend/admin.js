@@ -176,3 +176,168 @@ if (searchClient) {
 if (searchAppointment) {
     searchAppointment.addEventListener("input", () => loadAppointments())
 }
+
+// --- ABAS ---
+const tabBtnOverview = document.getElementById("tab-btn-overview")
+const tabBtnSchedule = document.getElementById("tab-btn-schedule")
+const tabOverview = document.getElementById("tab-overview")
+const tabSchedule = document.getElementById("tab-schedule")
+
+if (tabBtnOverview && tabBtnSchedule) {
+    tabBtnOverview.addEventListener("click", function() {
+        tabOverview.style.display = "block"
+        tabSchedule.style.display = "none"
+        tabBtnOverview.classList.add("active")
+        tabBtnSchedule.classList.remove("active")
+    })
+
+    tabBtnSchedule.addEventListener("click", function() {
+        tabOverview.style.display = "none"
+        tabSchedule.style.display = "block"
+        tabBtnSchedule.classList.add("active")
+        tabBtnOverview.classList.remove("active")
+        loadSchedule()
+        loadBlockedSlots()
+    })
+}
+
+// --- HORÁRIO DE ATENDIMENTO ---
+const startTimeInput = document.getElementById("schedule-start-time")
+const endTimeInput = document.getElementById("schedule-end-time")
+const saveScheduleBtn = document.getElementById("save-schedule-btn")
+
+function loadSchedule() {
+    fetch(`${API_URL}/schedule`, { headers: getAuthHeaders() })
+    .then(res => res.json())
+    .then(data => {
+        const activeDays = data.working_days.split(",")
+        document.querySelectorAll("#working-days-picker input[type=checkbox]").forEach(cb => {
+            cb.checked = activeDays.includes(cb.value)
+        })
+        startTimeInput.value = data.start_time
+        endTimeInput.value = data.end_time
+    })
+    .catch(error => console.error(error))
+}
+
+if (saveScheduleBtn) {
+    saveScheduleBtn.addEventListener("click", function() {
+        const checked = Array.from(document.querySelectorAll("#working-days-picker input[type=checkbox]:checked"))
+            .map(cb => cb.value)
+
+        if (checked.length === 0) {
+            showToast("Selecione pelo menos um dia de atendimento.", true)
+            return
+        }
+        if (!startTimeInput.value || !endTimeInput.value) {
+            showToast("Preencha o horário de início e fim.", true)
+            return
+        }
+
+        fetch(`${API_URL}/schedule`, {
+            method: "PUT",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                working_days: checked.join(","),
+                start_time: startTimeInput.value,
+                end_time: endTimeInput.value
+            })
+        })
+        .then(async response => {
+            const data = await response.json()
+            if (!response.ok) throw new Error(data.detail || "Erro ao salvar horário")
+            return data
+        })
+        .then(data => showToast(data.message))
+        .catch(error => showToast(error.message, true))
+    })
+}
+
+// --- BLOQUEIO DE DIAS E HORÁRIOS ---
+const blockDateInput = document.getElementById("block-date")
+const blockTimeInput = document.getElementById("block-time")
+const blockReasonInput = document.getElementById("block-reason")
+const createBlockBtn = document.getElementById("create-block-btn")
+const blockedSlotsList = document.getElementById("blocked-slots-list")
+
+function loadBlockedSlots() {
+    if (!blockedSlotsList) return
+
+    fetch(`${API_URL}/blocked-slots`, { headers: getAuthHeaders() })
+    .then(res => res.json())
+    .then(slots => {
+        blockedSlotsList.innerHTML = ""
+
+        if (slots.length === 0) {
+            blockedSlotsList.innerHTML = "<p class='section-description'>Nenhum bloqueio ativo.</p>"
+            return
+        }
+
+        slots.forEach(slot => {
+            const item = document.createElement("div")
+            item.classList.add("blocked-slot-item")
+
+            const info = document.createElement("div")
+            const title = document.createElement("strong")
+            title.innerText = slot.time ? `${slot.date} às ${slot.time}` : `${slot.date} (dia inteiro)`
+            const reason = document.createElement("p")
+            reason.style.margin = "4px 0 0"
+            reason.style.color = "#6B7280"
+            reason.style.fontSize = "13px"
+            reason.innerText = slot.reason || "Sem motivo informado"
+
+            info.appendChild(title)
+            info.appendChild(reason)
+
+            const deleteBtn = document.createElement("button")
+            deleteBtn.classList.add("btn-secondary")
+            deleteBtn.type = "button"
+            deleteBtn.innerText = "Remover"
+            deleteBtn.addEventListener("click", function() {
+                fetch(`${API_URL}/blocked-slots/${slot.id}`, {
+                    method: "DELETE",
+                    headers: getAuthHeaders()
+                })
+                .then(() => loadBlockedSlots())
+                .catch(error => console.error(error))
+            })
+
+            item.appendChild(info)
+            item.appendChild(deleteBtn)
+            blockedSlotsList.appendChild(item)
+        })
+    })
+    .catch(error => console.error(error))
+}
+
+if (createBlockBtn) {
+    createBlockBtn.addEventListener("click", function() {
+        if (!blockDateInput.value) {
+            showToast("Escolha uma data para bloquear.", true)
+            return
+        }
+
+        fetch(`${API_URL}/blocked-slots`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                date: blockDateInput.value,
+                time: blockTimeInput.value || null,
+                reason: blockReasonInput.value.trim() || null
+            })
+        })
+        .then(async response => {
+            const data = await response.json()
+            if (!response.ok) throw new Error(data.detail || "Erro ao bloquear")
+            return data
+        })
+        .then(data => {
+            showToast(data.message)
+            blockDateInput.value = ""
+            blockTimeInput.value = ""
+            blockReasonInput.value = ""
+            loadBlockedSlots()
+        })
+        .catch(error => showToast(error.message, true))
+    })
+}
