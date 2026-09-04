@@ -163,7 +163,7 @@
         <div class="section-header">
             <h2>Horário de Atendimento</h2>
         </div>
-        <p class="section-description">Escolha os dias e o intervalo de horário em que seu estabelecimento atende. Os agendamentos só ficam disponíveis dentro dessa janela.</p>
+        <p class="section-description">Escolha os dias, o intervalo de horário e o tempo entre cada agendamento. Os horários disponíveis pro cliente são calculados automaticamente a partir disso.</p>
 
         <div id="working-days-picker" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;">
             <label class="day-checkbox"><input type="checkbox" value="0"> Seg</label>
@@ -183,6 +183,17 @@
             <div style="flex:1; min-width:140px;">
                 <label style="display:block; margin-bottom:8px; font-weight:600;">Fim do atendimento</label>
                 <input type="time" id="schedule-end-time" class="input_field">
+            </div>
+            <div style="flex:1; min-width:180px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Duração de cada agendamento</label>
+                <select id="schedule-duration" class="input_field">
+                    <option value="15">15 minutos</option>
+                    <option value="30">30 minutos</option>
+                    <option value="45">45 minutos</option>
+                    <option value="60">1 hora</option>
+                    <option value="90">1h30</option>
+                    <option value="120">2 horas</option>
+                </select>
             </div>
         </div>
 
@@ -232,7 +243,7 @@
         <script src="config.js?v=2"></script>
         <div id="toast"></div>
         <script src="toast.js?v=2"></script>
-        <script src="admin.js?v=4"></script>
+        <script src="admin.js?v=5"></script>
 
 </body>
 

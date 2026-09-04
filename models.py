@@ -15,6 +15,7 @@ class Business(Base):
     working_days = Column(String, nullable=False, default="0,1,2,3,4")  # 0=Seg ... 6=Dom
     start_time = Column(String, nullable=False, default="08:00")
     end_time = Column(String, nullable=False, default="18:00")
+    slot_duration_minutes = Column(Integer, nullable=False, default=60)  # intervalo entre horários
 
     # Relacionamentos
     clients = relationship("Client", back_populates="business")

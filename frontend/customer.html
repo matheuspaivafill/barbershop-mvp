@@ -37,11 +37,12 @@
             <section class="form-card">
                 <h2>2. Escolha a Data e Horário</h2>
                 <p class="section-description">Digite seu telefone para identificarmos seu cadastro, e escolha um horário disponível.</p>
-                
+
                 <form id="appointment-form">
                     <label style="display:block; margin-bottom: 8px; font-weight: 600;">Seu WhatsApp</label>
                     <input type="tel" id="confirm-phone" class="input_field" placeholder="Digite o telefone do seu cadastro" required>
                     <p id="client-found-msg" class="section-description" style="min-height: 20px; margin-top: -8px;"></p>
+                    <div id="existing-appointments-box" style="display:none; background:#EFF6FF; border-radius:10px; padding:14px 16px; margin-bottom:18px; font-size:14px; color:#1E40AF;"></div>
 
                     <label style="display:block; margin-bottom: 8px; font-weight: 600;">Data do Agendamento</label>
                     <input type="date" id="appointment-date" class="input_field" required>
@@ -60,6 +61,6 @@
     <div id="toast"></div>
     <script src="toast.js?v=2"></script>
     <script src="clients.js?v=3"></script>
-    <script src="appointments.js?v=3"></script>
+    <script src="appointments.js?v=4"></script>
 </body>
 </html>

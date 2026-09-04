@@ -72,12 +72,14 @@ class AppointmentCreate(BaseModel):
 
 
 TIME_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+ALLOWED_DURATIONS = [15, 30, 45, 60, 90, 120]
 
 # Esquemas para configuração de horário de atendimento
 class ScheduleUpdate(BaseModel):
     working_days: str  # Ex: "0,1,2,3,4" (0=Segunda ... 6=Domingo)
     start_time: str    # Ex: "08:00"
     end_time: str       # Ex: "18:00"
+    slot_duration_minutes: int = 60  # intervalo entre horários disponíveis
 
     @field_validator("working_days")
     @classmethod
@@ -96,6 +98,13 @@ class ScheduleUpdate(BaseModel):
     def validate_time_format(cls, v):
         if not TIME_RE.match(v):
             raise ValueError("Horário inválido. Use o formato HH:MM.")
+        return v
+
+    @field_validator("slot_duration_minutes")
+    @classmethod
+    def validate_duration(cls, v):
+        if v not in ALLOWED_DURATIONS:
+            raise ValueError(f"Intervalo inválido. Use um destes: {ALLOWED_DURATIONS}.")
         return v
 
 # Esquemas para bloqueio de dias/horários

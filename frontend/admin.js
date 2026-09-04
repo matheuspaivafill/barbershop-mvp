@@ -122,16 +122,15 @@ function loadAppointments() {
         appointmentsList.innerHTML = ""
 
         data.forEach(function(appointment) {
+            const clientName = appointment.client_name || `Cliente ${appointment.client_id || ""}`
+
+            const search = searchAppointment ? searchAppointment.value.toLowerCase() : ""
+            if (!clientName.toLowerCase().includes(search)) return
+
             const appointmentCard = document.createElement("div")
             const deleteButton = document.createElement("button")
             deleteButton.innerText = "🗑"
             appointmentCard.classList.add("client-card")
-
-            const client = clients.find(c => c.id === appointment.client_id)
-            const clientName = client ? client.name : `Cliente ${appointment.client_id}`
-
-            const search = searchAppointment ? searchAppointment.value.toLowerCase() : ""
-            if (!clientName.toLowerCase().includes(search)) return
 
             const info = document.createElement("div")
             info.classList.add("card-info")
@@ -204,6 +203,7 @@ if (tabBtnOverview && tabBtnSchedule) {
 // --- HORÁRIO DE ATENDIMENTO ---
 const startTimeInput = document.getElementById("schedule-start-time")
 const endTimeInput = document.getElementById("schedule-end-time")
+const durationSelect = document.getElementById("schedule-duration")
 const saveScheduleBtn = document.getElementById("save-schedule-btn")
 
 function loadSchedule() {
@@ -216,6 +216,9 @@ function loadSchedule() {
         })
         startTimeInput.value = data.start_time
         endTimeInput.value = data.end_time
+        if (durationSelect && data.slot_duration_minutes) {
+            durationSelect.value = String(data.slot_duration_minutes)
+        }
     })
     .catch(error => console.error(error))
 }
@@ -240,7 +243,8 @@ if (saveScheduleBtn) {
             body: JSON.stringify({
                 working_days: checked.join(","),
                 start_time: startTimeInput.value,
-                end_time: endTimeInput.value
+                end_time: endTimeInput.value,
+                slot_duration_minutes: parseInt(durationSelect ? durationSelect.value : "60")
             })
         })
         .then(async response => {

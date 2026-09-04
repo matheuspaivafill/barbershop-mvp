@@ -9,6 +9,7 @@ const businessSearchStatus = document.getElementById("business-search-status")
 const appointmentForm = document.getElementById("appointment-form")
 const confirmPhone = document.getElementById("confirm-phone")
 const clientFoundMsg = document.getElementById("client-found-msg")
+const existingAppointmentsBox = document.getElementById("existing-appointments-box")
 const appointmentDate = document.getElementById("appointment-date")
 const timeSelect = document.getElementById("time-select")
 const submitAppointmentBtn = document.getElementById("submit-appointment-btn")
@@ -72,39 +73,6 @@ if (switchBusinessBtn) {
     })
 }
 
-// Busca o cliente pelo telefone digitado, assim que a pessoa termina de digitar
-let lookupTimeout = null
-if (confirmPhone) {
-    confirmPhone.addEventListener("input", function() {
-        window.foundClientId = null
-        clientFoundMsg.innerText = ""
-        clientFoundMsg.style.color = ""
-
-        clearTimeout(lookupTimeout)
-        const phone = confirmPhone.value.trim()
-        if (!window.currentBusinessId || phone.replace(/\D/g, "").length < 8) return
-
-        lookupTimeout = setTimeout(() => {
-            fetch(`${API_URL}/client/lookup?business_id=${window.currentBusinessId}&phone=${encodeURIComponent(phone)}`)
-            .then(async res => {
-                const data = await res.json()
-                if (!res.ok) throw new Error(data.detail || "Cadastro não encontrado")
-                return data
-            })
-            .then(data => {
-                window.foundClientId = data.client_id
-                clientFoundMsg.innerText = `✓ Agendando para ${data.name}`
-                clientFoundMsg.style.color = "green"
-            })
-            .catch(error => {
-                window.foundClientId = null
-                clientFoundMsg.innerText = "Não encontramos esse telefone. Cadastre-se no passo 1 primeiro."
-                clientFoundMsg.style.color = "#c0392b"
-            })
-        }, 500)
-    })
-}
-
 if (searchBusinessInput) {
     searchBusinessInput.addEventListener("change", function() {
         const slug = searchBusinessInput.value.trim().toLowerCase().replace(/\s+/g, "-")
@@ -126,6 +94,60 @@ if (searchBusinessInput) {
     })
 }
 
+// Busca o cliente pelo telefone digitado, assim que a pessoa termina de digitar,
+// e também mostra se ela já tem algum agendamento futuro marcado (lembrete).
+let lookupTimeout = null
+if (confirmPhone) {
+    confirmPhone.addEventListener("input", function() {
+        window.foundClientId = null
+        clientFoundMsg.innerText = ""
+        clientFoundMsg.style.color = ""
+        if (existingAppointmentsBox) existingAppointmentsBox.style.display = "none"
+
+        clearTimeout(lookupTimeout)
+        const phone = confirmPhone.value.trim()
+        if (!window.currentBusinessId || phone.replace(/\D/g, "").length < 8) return
+
+        lookupTimeout = setTimeout(() => {
+            fetch(`${API_URL}/client/lookup?business_id=${window.currentBusinessId}&phone=${encodeURIComponent(phone)}`)
+            .then(async res => {
+                const data = await res.json()
+                if (!res.ok) throw new Error(data.detail || "Cadastro não encontrado")
+                return data
+            })
+            .then(data => {
+                window.foundClientId = data.client_id
+                clientFoundMsg.innerText = `✓ Agendando para ${data.name}`
+                clientFoundMsg.style.color = "green"
+
+                // Verifica se esse cliente já tem agendamentos marcados nesse estabelecimento
+                fetch(`${API_URL}/client/appointments?business_id=${window.currentBusinessId}&phone=${encodeURIComponent(phone)}`)
+                .then(res => res.json())
+                .then(appointments => {
+                    if (!existingAppointmentsBox) return
+                    if (appointments.length === 0) {
+                        existingAppointmentsBox.style.display = "none"
+                        return
+                    }
+                    const items = appointments.map(a => `${a.date} às ${a.time}`).join(", ")
+                    const label = appointments.length === 1 ? "Você já tem um agendamento marcado:" : "Você já tem agendamentos marcados:"
+                    existingAppointmentsBox.innerText = `📅 ${label} ${items}`
+                    existingAppointmentsBox.style.display = "block"
+                })
+                .catch(() => {
+                    if (existingAppointmentsBox) existingAppointmentsBox.style.display = "none"
+                })
+            })
+            .catch(error => {
+                window.foundClientId = null
+                clientFoundMsg.innerText = "Não encontramos esse telefone. Cadastre-se no passo 1 primeiro."
+                clientFoundMsg.style.color = "#c0392b"
+                if (existingAppointmentsBox) existingAppointmentsBox.style.display = "none"
+            })
+        }, 500)
+    })
+}
+
 appointmentDate.addEventListener("change", function() {
     if (!window.currentBusinessId || !appointmentDate.value) return
 
@@ -133,7 +155,7 @@ appointmentDate.addEventListener("change", function() {
     .then(res => res.json())
     .then(times => {
         timeSelect.innerHTML = ""
-        
+
         if (times.length === 0) {
             timeSelect.innerHTML = '<option value="">Sem horários disponíveis para esta data</option>'
             timeSelect.disabled = true
@@ -184,6 +206,7 @@ appointmentForm.addEventListener("submit", function(event) {
         appointmentForm.reset()
         confirmPhone.value = ""
         clientFoundMsg.innerText = ""
+        if (existingAppointmentsBox) existingAppointmentsBox.style.display = "none"
         window.foundClientId = null
         timeSelect.disabled = true
         submitAppointmentBtn.disabled = true
