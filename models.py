@@ -16,6 +16,7 @@ class Business(Base):
     start_time = Column(String, nullable=False, default="08:00")
     end_time = Column(String, nullable=False, default="18:00")
     slot_duration_minutes = Column(Integer, nullable=False, default=60)  # intervalo entre horários
+    capacity = Column(Integer, nullable=False, default=1)  # quantos atendimentos simultâneos (ex: nº de profissionais)
 
     # Relacionamentos
     clients = relationship("Client", back_populates="business")

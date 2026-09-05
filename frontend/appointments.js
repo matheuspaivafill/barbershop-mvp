@@ -1,5 +1,14 @@
 window.currentBusinessId = null
 
+// Converte data no formato AAAA-MM-DD (usado internamente) para DD/MM/AAAA (formato brasileiro)
+function formatDateBR(isoDate) {
+    if (!isoDate) return isoDate
+    const parts = isoDate.split("-")
+    if (parts.length !== 3) return isoDate
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+}
+
 const businessDisplayName = document.getElementById("business-display-name")
 const switchBusinessBtn = document.getElementById("switch-business-btn")
 const selectBusinessSection = document.getElementById("select-business-section")
@@ -129,7 +138,7 @@ if (confirmPhone) {
                         existingAppointmentsBox.style.display = "none"
                         return
                     }
-                    const items = appointments.map(a => `${a.date} às ${a.time}`).join(", ")
+                    const items = appointments.map(a => `${formatDateBR(a.date)} às ${a.time}`).join(", ")
                     const label = appointments.length === 1 ? "Você já tem um agendamento marcado:" : "Você já tem agendamentos marcados:"
                     existingAppointmentsBox.innerText = `📅 ${label} ${items}`
                     existingAppointmentsBox.style.display = "block"

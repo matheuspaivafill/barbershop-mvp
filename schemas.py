@@ -80,6 +80,7 @@ class ScheduleUpdate(BaseModel):
     start_time: str    # Ex: "08:00"
     end_time: str       # Ex: "18:00"
     slot_duration_minutes: int = 60  # intervalo entre horários disponíveis
+    capacity: int = 1  # quantos atendimentos simultâneos (ex: nº de profissionais)
 
     @field_validator("working_days")
     @classmethod
@@ -98,6 +99,13 @@ class ScheduleUpdate(BaseModel):
     def validate_time_format(cls, v):
         if not TIME_RE.match(v):
             raise ValueError("Horário inválido. Use o formato HH:MM.")
+        return v
+
+    @field_validator("capacity")
+    @classmethod
+    def validate_capacity(cls, v):
+        if v < 1 or v > 20:
+            raise ValueError("O número de atendimentos simultâneos deve ser entre 1 e 20.")
         return v
 
     @field_validator("slot_duration_minutes")

@@ -4,6 +4,15 @@ if (!token) {
     window.location.href = "login.html"
 }
 
+// Converte data no formato AAAA-MM-DD (usado internamente) para DD/MM/AAAA (formato brasileiro)
+function formatDateBR(isoDate) {
+    if (!isoDate) return isoDate
+    const parts = isoDate.split("-")
+    if (parts.length !== 3) return isoDate
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+}
+
 const logoutBtn = document.getElementById("logout-btn")
 if (logoutBtn) {
     logoutBtn.addEventListener("click", function() {
@@ -138,7 +147,7 @@ function loadAppointments() {
             const nameEl = document.createElement("h3")
             nameEl.textContent = `📅 ${clientName}`
             const dateEl = document.createElement("p")
-            dateEl.textContent = `🗓 ${appointment.date}`
+            dateEl.textContent = `🗓 ${formatDateBR(appointment.date)}`
             const timeEl = document.createElement("p")
             timeEl.textContent = `🕒 ${appointment.time}`
 
@@ -204,6 +213,7 @@ if (tabBtnOverview && tabBtnSchedule) {
 const startTimeInput = document.getElementById("schedule-start-time")
 const endTimeInput = document.getElementById("schedule-end-time")
 const durationSelect = document.getElementById("schedule-duration")
+const capacityInput = document.getElementById("schedule-capacity")
 const saveScheduleBtn = document.getElementById("save-schedule-btn")
 
 function loadSchedule() {
@@ -218,6 +228,9 @@ function loadSchedule() {
         endTimeInput.value = data.end_time
         if (durationSelect && data.slot_duration_minutes) {
             durationSelect.value = String(data.slot_duration_minutes)
+        }
+        if (capacityInput && data.capacity) {
+            capacityInput.value = data.capacity
         }
     })
     .catch(error => console.error(error))
@@ -244,7 +257,8 @@ if (saveScheduleBtn) {
                 working_days: checked.join(","),
                 start_time: startTimeInput.value,
                 end_time: endTimeInput.value,
-                slot_duration_minutes: parseInt(durationSelect ? durationSelect.value : "60")
+                slot_duration_minutes: parseInt(durationSelect ? durationSelect.value : "60"),
+                capacity: parseInt(capacityInput ? capacityInput.value : "1")
             })
         })
         .then(async response => {
@@ -283,7 +297,7 @@ function loadBlockedSlots() {
 
             const info = document.createElement("div")
             const title = document.createElement("strong")
-            title.innerText = slot.time ? `${slot.date} às ${slot.time}` : `${slot.date} (dia inteiro)`
+            title.innerText = slot.time ? `${formatDateBR(slot.date)} às ${slot.time}` : `${formatDateBR(slot.date)} (dia inteiro)`
             const reason = document.createElement("p")
             reason.style.margin = "4px 0 0"
             reason.style.color = "#6B7280"

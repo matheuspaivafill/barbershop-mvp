@@ -273,7 +273,12 @@ def available_times(business_id: int, date: str, db: Session = Depends(get_db)):
         Appointment.business_id == business_id,
         Appointment.date == date
     ).all()
-    occupied_times = {ap.time for ap in appointments_day}
+    # Conta quantos agendamentos já existem em cada horário — um horário só fica
+    # indisponível quando atinge a capacidade (nº de profissionais) do estabelecimento.
+    occupied_count = {}
+    for ap in appointments_day:
+        occupied_count[ap.time] = occupied_count.get(ap.time, 0) + 1
+    full_times = {tm for tm, count in occupied_count.items() if count >= business.capacity}
 
     blocked_slots_day = db.query(BlockedSlot).filter(
         BlockedSlot.business_id == business_id,
@@ -282,7 +287,7 @@ def available_times(business_id: int, date: str, db: Session = Depends(get_db)):
     ).all()
     blocked_times = {b.time for b in blocked_slots_day}
 
-    available = [tm for tm in all_times if tm not in occupied_times and tm not in blocked_times]
+    available = [tm for tm in all_times if tm not in full_times and tm not in blocked_times]
     return available
 
 
@@ -332,13 +337,13 @@ def create_appointment(appointment: AppointmentCreate, db: Session = Depends(get
     if slot_blocked:
         raise HTTPException(status_code=400, detail="Esse horário não está disponível.")
 
-    existing = db.query(Appointment).filter(
+    existing_count = db.query(Appointment).filter(
         Appointment.business_id == appointment.business_id,
         Appointment.date == appointment.date,
         Appointment.time == appointment.time
-    ).first()
+    ).count()
 
-    if existing:
+    if existing_count >= business.capacity:
         raise HTTPException(status_code=400, detail="Horário já ocupado nesta empresa.")
 
     new_appointment = Appointment(
@@ -432,7 +437,8 @@ def get_schedule(current_business: Business = Depends(get_current_business)):
         "working_days": current_business.working_days,
         "start_time": current_business.start_time,
         "end_time": current_business.end_time,
-        "slot_duration_minutes": current_business.slot_duration_minutes
+        "slot_duration_minutes": current_business.slot_duration_minutes,
+        "capacity": current_business.capacity
     }
 
 
@@ -451,6 +457,7 @@ def update_schedule(
     current_business.start_time = schedule.start_time
     current_business.end_time = schedule.end_time
     current_business.slot_duration_minutes = schedule.slot_duration_minutes
+    current_business.capacity = schedule.capacity
     db.commit()
     return {"message": "Horário de atendimento atualizado com sucesso!"}
 
